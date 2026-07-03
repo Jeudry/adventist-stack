@@ -1,0 +1,38 @@
+# Infraestructura de desarrollo: PostgreSQL, Redis y MailHog.
+# Levantar con:  make infra-up   (o docker compose -f deploy/docker-compose.yml up -d)
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: adventist_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: adventist_stack
+    ports:
+      - "5432:5432"
+    volumes:
+      - adventist_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: adventist_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - adventist_redisdata:/data
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: adventist_mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # UI web:  http://localhost:8025
+
+volumes:
+  adventist_pgdata:
+  adventist_redisdata:

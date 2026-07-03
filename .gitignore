@@ -1,0 +1,25 @@
+# ── Secretos / entorno ──────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Go ──────────────────────────────────────────────────────
+/bin/
+*.exe
+*.out
+vendor/
+
+# ── Editores / OS ───────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# ── Flutter (client/) ───────────────────────────────────────
+client/.dart_tool/
+client/.flutter-plugins
+client/.flutter-plugins-dependencies
+client/build/
+client/.pub-cache/
+client/.pub/
+client/**/GeneratedPluginRegistrant.*

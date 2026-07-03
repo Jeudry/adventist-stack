@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package notifications.v1;
+
+option go_package = "github.com/Jeudry/adventist-stack/gen/notifications/v1;notificationsv1";
+
+// NotificationService envía correos con plantillas y publica notificaciones
+// en tiempo real vía Redis pub/sub.
+service NotificationService {
+  rpc SendEmail(SendEmailRequest) returns (SendEmailResponse);
+  rpc PublishNotification(PublishNotificationRequest) returns (PublishNotificationResponse);
+}
+
+message SendEmailRequest {
+  string to = 1;
+  string template = 2;                 // nombre de la plantilla, ej. "welcome"
+  map<string, string> variables = 3;   // variables a interpolar en la plantilla
+}
+
+message SendEmailResponse {
+  bool sent = 1;
+}
+
+message PublishNotificationRequest {
+  string user_id = 1;
+  string title = 2;
+  string body = 3;
+}
+
+message PublishNotificationResponse {
+  bool published = 1;
+  string notification_id = 2;
+}
