@@ -9,7 +9,7 @@ con gRPC** y un **API Gateway REST**, con app **Flutter multiplataforma** en
 ```
 ┌────────────┐        REST/JSON        ┌──────────────┐
 │  Flutter   │  ───────────────────▶   │   Gateway    │  (chi, JWT, Swagger,
-│  (client/) │                         │  :8080       │   rate limit, CORS)
+│  (client/) │                         │  :8090       │   rate limit, CORS)
 └────────────┘                         └──────┬───────┘
                                               │ gRPC
                           ┌───────────────────┼────────────────────┐
@@ -64,25 +64,25 @@ make run-gateway
 make client
 ```
 
-- API Gateway: <http://localhost:8080>
-- Swagger UI: <http://localhost:8080/swagger>
+- API Gateway: <http://localhost:8090>
+- Swagger UI: <http://localhost:8090/swagger>
 - Bandeja de correos (MailHog): <http://localhost:8025>
 
 ## Probar la API
 
 ```bash
 # Registro
-curl -X POST http://localhost:8080/api/v1/auth/register \
+curl -X POST http://localhost:8090/api/v1/auth/register \
   -H 'Content-Type: application/json' \
   -d '{"email":"pastor@iglesia.org","name":"Pastor","password":"secreto123"}'
 
 # Login
-curl -X POST http://localhost:8080/api/v1/auth/login \
+curl -X POST http://localhost:8090/api/v1/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"pastor@iglesia.org","password":"secreto123"}'
 
 # Ruta protegida (usa el access_token del paso anterior)
-curl http://localhost:8080/api/v1/me -H 'Authorization: Bearer <ACCESS_TOKEN>'
+curl http://localhost:8090/api/v1/me -H 'Authorization: Bearer <ACCESS_TOKEN>'
 ```
 
 ## Comandos útiles

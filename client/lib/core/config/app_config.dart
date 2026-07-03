@@ -6,6 +6,6 @@ class AppConfig {
   /// URL base del API Gateway.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:8080',
+    defaultValue: 'http://localhost:8090',
   );
 }

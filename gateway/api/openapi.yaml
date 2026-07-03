@@ -4,7 +4,7 @@ info:
   description: API Gateway REST del ecosistema Adventist Stack (microservicios gRPC).
   version: 0.1.0
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8090
 paths:
   /health:
     get:
