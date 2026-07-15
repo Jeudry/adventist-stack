@@ -1,0 +1,15 @@
+# Configuración de buf (linter/validador de protos que usa el editor).
+# NOTA: la generación de código la hacemos con `protoc` (ver `make proto`);
+# este archivo es solo para que el linter sepa que la RAÍZ de los protos es
+# `proto/`, y así resuelve bien las rutas (regla PACKAGE_DIRECTORY_MATCH).
+version: v2
+modules:
+  - path: proto
+lint:
+  # STANDARD = convenciones recomendadas de Google/buf: nombres de RPC
+  # request/response estándar y únicos, sufijo de versión en el package, etc.
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE
