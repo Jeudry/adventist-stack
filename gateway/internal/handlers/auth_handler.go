@@ -65,7 +65,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, toAuthResponse(res))
+	writeJSON(w, http.StatusCreated, toAuthResponse(res.GetSession()))
 }
 
 // Login maneja POST /api/v1/auth/login.
@@ -85,18 +85,18 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toAuthResponse(res))
+	writeJSON(w, http.StatusOK, toAuthResponse(res.GetSession()))
 }
 
-func toAuthResponse(res *authv1.AuthResponse) AuthResponse {
+func toAuthResponse(s *authv1.Session) AuthResponse {
 	return AuthResponse{
 		User: UserVM{
-			ID:    res.GetUser().GetId(),
-			Email: res.GetUser().GetEmail(),
-			Name:  res.GetUser().GetName(),
-			Role:  res.GetUser().GetRole(),
+			ID:    s.GetUser().GetId(),
+			Email: s.GetUser().GetEmail(),
+			Name:  s.GetUser().GetName(),
+			Role:  s.GetUser().GetRole(),
 		},
-		AccessToken:  res.GetAccessToken(),
-		RefreshToken: res.GetRefreshToken(),
+		AccessToken:  s.GetAccessToken(),
+		RefreshToken: s.GetRefreshToken(),
 	}
 }

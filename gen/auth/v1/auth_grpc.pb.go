@@ -31,10 +31,10 @@ const (
 //
 // AuthService maneja registro, login y validación de tokens.
 type AuthServiceClient interface {
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*AuthResponse, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
-	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
 }
 
 type authServiceClient struct {
@@ -45,9 +45,9 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 	return &authServiceClient{cc}
 }
 
-func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthResponse)
+	out := new(RegisterResponse)
 	err := c.cc.Invoke(ctx, AuthService_Register_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -55,9 +55,9 @@ func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, o
 	return out, nil
 }
 
-func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthResponse)
+	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, AuthService_Login_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -75,9 +75,9 @@ func (c *authServiceClient) ValidateToken(ctx context.Context, in *ValidateToken
 	return out, nil
 }
 
-func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthResponse)
+	out := new(RefreshTokenResponse)
 	err := c.cc.Invoke(ctx, AuthService_RefreshToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -91,10 +91,10 @@ func (c *authServiceClient) RefreshToken(ctx context.Context, in *RefreshTokenRe
 //
 // AuthService maneja registro, login y validación de tokens.
 type AuthServiceServer interface {
-	Register(context.Context, *RegisterRequest) (*AuthResponse, error)
-	Login(context.Context, *LoginRequest) (*AuthResponse, error)
+	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
-	RefreshToken(context.Context, *RefreshTokenRequest) (*AuthResponse, error)
+	RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -105,16 +105,16 @@ type AuthServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAuthServiceServer struct{}
 
-func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*AuthResponse, error) {
+func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*AuthResponse, error) {
+func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ValidateToken not implemented")
 }
-func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*AuthResponse, error) {
+func (UnimplementedAuthServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*RefreshTokenResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RefreshToken not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}

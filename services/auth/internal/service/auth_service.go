@@ -98,7 +98,8 @@ func (s *AuthService) ValidateToken(accessToken string) (userID, role string, er
 }
 
 func (s *AuthService) issue(u domain.User) (Tokens, error) {
-	access, refresh, err := s.jwt.Generate(u.ID, string(u.Role))
+	// El JWT usa el id como string (el "subject" del token).
+	access, refresh, err := s.jwt.Generate(u.ID.String(), string(u.Role))
 	if err != nil {
 		return Tokens{}, err
 	}

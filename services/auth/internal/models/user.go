@@ -5,12 +5,14 @@ package models
 import (
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/Jeudry/adventist-stack/services/auth/internal/domain"
 )
 
 // User mapea la tabla users.
 type User struct {
-	ID           string
+	ID           uuid.UUID
 	Email        string
 	Name         string
 	PasswordHash string

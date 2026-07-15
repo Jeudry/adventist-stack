@@ -2,7 +2,11 @@
 // independientes de la base de datos y del transporte.
 package domain
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 // Errores de dominio reutilizables por las capas superiores.
 var (
@@ -21,7 +25,7 @@ const (
 
 // User es el modelo de dominio. No conoce columnas ni JSON.
 type User struct {
-	ID           string
+	ID           uuid.UUID
 	Email        string
 	Name         string
 	PasswordHash string

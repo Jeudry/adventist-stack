@@ -6,10 +6,10 @@ option go_package = "github.com/Jeudry/adventist-stack/gen/auth/v1;authv1";
 
 // AuthService maneja registro, login y validación de tokens.
 service AuthService {
-  rpc Register(RegisterRequest) returns (AuthResponse);
-  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Login(LoginRequest) returns (LoginResponse);
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
-  rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 }
 
 message User {
@@ -19,10 +19,23 @@ message User {
   string role = 4;
 }
 
+// Session son los datos de sesión (usuario + tokens) que comparten las
+// respuestas de auth. Se anida dentro de cada *Response para no duplicar
+// campos, sin violar la regla de "response único por RPC".
+message Session {
+  User user = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+}
+
 message RegisterRequest {
   string email = 1;
   string name = 2;
   string password = 3;
+}
+
+message RegisterResponse {
+  Session session = 1;
 }
 
 message LoginRequest {
@@ -30,10 +43,8 @@ message LoginRequest {
   string password = 2;
 }
 
-message AuthResponse {
-  User user = 1;
-  string access_token = 2;
-  string refresh_token = 3;
+message LoginResponse {
+  Session session = 1;
 }
 
 message ValidateTokenRequest {
@@ -48,4 +59,8 @@ message ValidateTokenResponse {
 
 message RefreshTokenRequest {
   string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  Session session = 1;
 }

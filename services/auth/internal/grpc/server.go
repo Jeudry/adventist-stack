@@ -25,21 +25,21 @@ func NewServer(svc *service.AuthService) *Server {
 }
 
 // Register da de alta un usuario.
-func (s *Server) Register(ctx context.Context, req *authv1.RegisterRequest) (*authv1.AuthResponse, error) {
+func (s *Server) Register(ctx context.Context, req *authv1.RegisterRequest) (*authv1.RegisterResponse, error) {
 	user, tokens, err := s.svc.Register(ctx, req.GetEmail(), req.GetName(), req.GetPassword())
 	if err != nil {
 		return nil, toStatus(err)
 	}
-	return buildAuthResponse(user, tokens.Access, tokens.Refresh), nil
+	return &authv1.RegisterResponse{Session: buildSession(user, tokens.Access, tokens.Refresh)}, nil
 }
 
 // Login autentica un usuario.
-func (s *Server) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.AuthResponse, error) {
+func (s *Server) Login(ctx context.Context, req *authv1.LoginRequest) (*authv1.LoginResponse, error) {
 	user, tokens, err := s.svc.Login(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		return nil, toStatus(err)
 	}
-	return buildAuthResponse(user, tokens.Access, tokens.Refresh), nil
+	return &authv1.LoginResponse{Session: buildSession(user, tokens.Access, tokens.Refresh)}, nil
 }
 
 // ValidateToken valida un access token.
@@ -52,7 +52,7 @@ func (s *Server) ValidateToken(ctx context.Context, req *authv1.ValidateTokenReq
 }
 
 // RefreshToken emite un nuevo par de tokens a partir de un refresh válido.
-func (s *Server) RefreshToken(ctx context.Context, req *authv1.RefreshTokenRequest) (*authv1.AuthResponse, error) {
+func (s *Server) RefreshToken(ctx context.Context, req *authv1.RefreshTokenRequest) (*authv1.RefreshTokenResponse, error) {
 	// El refresh token comparte el formato del access token; reutilizamos la
 	// validación y volvemos a emitir. (Extensible a rotación/lista negra.)
 	userID, role, err := s.svc.ValidateToken(req.GetRefreshToken())
@@ -64,10 +64,10 @@ func (s *Server) RefreshToken(ctx context.Context, req *authv1.RefreshTokenReque
 	return nil, status.Error(codes.Unimplemented, "rotación de refresh token pendiente de implementar")
 }
 
-func buildAuthResponse(u domain.User, access, refresh string) *authv1.AuthResponse {
-	return &authv1.AuthResponse{
+func buildSession(u domain.User, access, refresh string) *authv1.Session {
+	return &authv1.Session{
 		User: &authv1.User{
-			Id:    u.ID,
+			Id:    u.ID.String(), // proto usa string; el dominio usa uuid.UUID
 			Email: u.Email,
 			Name:  u.Name,
 			Role:  string(u.Role),

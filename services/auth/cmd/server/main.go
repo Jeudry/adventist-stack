@@ -42,7 +42,7 @@ func main() {
 
 	// Migraciones.
 	if cfg.Postgres.AutoMigrate {
-		if err := database.Migrate(cfg.Postgres.DSN, auth.MigrationsFS, "migrations"); err != nil {
+		if err := database.Migrate(cfg.Postgres.DSN, "auth_schema_migrations", auth.MigrationsFS, "migrations"); err != nil {
 			log.Error("migraciones fallaron", "err", err)
 			os.Exit(1)
 		}
