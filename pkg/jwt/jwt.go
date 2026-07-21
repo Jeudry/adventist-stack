@@ -1,4 +1,3 @@
-// Package jwt emite y valida tokens de acceso y refresh (HMAC-SHA256).
 package jwt
 
 import (
@@ -8,13 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Claims son los datos que viajan dentro del token.
 type Claims struct {
 	Role string `json:"role"`
 	jwt.RegisteredClaims
 }
 
-// Manager centraliza la emisión y validación de tokens.
 type Manager struct {
 	secret     []byte
 	issuer     string
@@ -22,7 +19,6 @@ type Manager struct {
 	refreshTTL time.Duration
 }
 
-// NewManager crea un Manager con el secreto y tiempos de vida dados.
 func NewManager(secret, issuer string, accessTTL, refreshTTL time.Duration) *Manager {
 	return &Manager{
 		secret:     []byte(secret),
@@ -32,7 +28,6 @@ func NewManager(secret, issuer string, accessTTL, refreshTTL time.Duration) *Man
 	}
 }
 
-// Generate produce un par (access, refresh) para el usuario dado.
 func (m *Manager) Generate(userID, role string) (access, refresh string, err error) {
 	access, err = m.sign(userID, role, m.accessTTL)
 	if err != nil {
@@ -64,11 +59,10 @@ func (m *Manager) sign(userID, role string, ttl time.Duration) (string, error) {
 	return signed, nil
 }
 
-// Verify valida la firma y expiración, y devuelve los claims.
 func (m *Manager) Verify(token string) (*Claims, error) {
 	parsed, err := jwt.ParseWithClaims(token, &Claims{}, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("jwt: método de firma inesperado: %v", t.Header["alg"])
+			return nil, fmt.Errorf("jwt: unexpected signing method: %v", t.Header["alg"])
 		}
 		return m.secret, nil
 	}, jwt.WithIssuer(m.issuer))
@@ -77,7 +71,7 @@ func (m *Manager) Verify(token string) (*Claims, error) {
 	}
 	claims, ok := parsed.Claims.(*Claims)
 	if !ok || !parsed.Valid {
-		return nil, fmt.Errorf("jwt: token inválido")
+		return nil, fmt.Errorf("jwt: invalid token")
 	}
 	return claims, nil
 }

@@ -1,5 +1,3 @@
-// Package logger provee un *slog.Logger estructurado y consistente para todos
-// los servicios.
 package logger
 
 import (
@@ -8,7 +6,6 @@ import (
 	"strings"
 )
 
-// New crea un logger JSON estructurado. En "dev" usa salida de texto legible.
 func New(service, environment string) *slog.Logger {
 	level := slog.LevelInfo
 	if strings.EqualFold(environment, "dev") || strings.EqualFold(environment, "development") {

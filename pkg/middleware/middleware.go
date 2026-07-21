@@ -1,5 +1,3 @@
-// Package middleware agrupa los middlewares HTTP reutilizables del gateway:
-// autenticación JWT, rate limiting y CORS.
 package middleware
 
 import (
@@ -21,8 +19,6 @@ const (
 	roleKey   ctxKey = "role"
 )
 
-// Auth valida el header Authorization: Bearer <token> y guarda el userID y
-// el role en el contexto. Rechaza con 401 si el token es inválido o falta.
 func Auth(manager *jwt.Manager) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -46,24 +42,20 @@ func Auth(manager *jwt.Manager) func(http.Handler) http.Handler {
 	}
 }
 
-// UserID extrae el ID del usuario autenticado del contexto.
 func UserID(ctx context.Context) string {
 	id, _ := ctx.Value(userIDKey).(string)
 	return id
 }
 
-// Role extrae el rol del usuario autenticado del contexto.
 func Role(ctx context.Context) string {
 	role, _ := ctx.Value(roleKey).(string)
 	return role
 }
 
-// RateLimit limita las peticiones por IP (requests por ventana de tiempo).
 func RateLimit(requests int, window time.Duration) func(http.Handler) http.Handler {
 	return httprate.LimitByIP(requests, window)
 }
 
-// CORS devuelve un middleware CORS configurado a partir de los orígenes dados.
 func CORS(allowedOrigins []string) func(http.Handler) http.Handler {
 	return cors.Handler(cors.Options{
 		AllowedOrigins:   allowedOrigins,

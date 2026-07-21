@@ -1,4 +1,3 @@
-// Package mailer envía correos HTML renderizando plantillas.
 package mailer
 
 import (
@@ -9,7 +8,6 @@ import (
 	"strings"
 )
 
-// Mailer envía correos vía SMTP usando un conjunto de plantillas precargadas.
 type Mailer struct {
 	host      string
 	port      int
@@ -19,8 +17,6 @@ type Mailer struct {
 	templates *template.Template
 }
 
-// New crea un Mailer. templates es el árbol de plantillas ya parseado
-// (típicamente cargado con template.ParseFS desde un embed.FS).
 func New(host string, port int, user, pass, from string, templates *template.Template) *Mailer {
 	return &Mailer{
 		host:      host,
@@ -32,9 +28,6 @@ func New(host string, port int, user, pass, from string, templates *template.Tem
 	}
 }
 
-// Send renderiza la plantilla name con data y envía el correo a "to".
-// El asunto se toma de la primera línea de la plantilla con el prefijo
-// "Subject:", o de un valor por defecto.
 func (m *Mailer) Send(to, name string, data map[string]string) error {
 	var body bytes.Buffer
 	if err := m.templates.ExecuteTemplate(&body, name+".html", data); err != nil {
@@ -43,7 +36,7 @@ func (m *Mailer) Send(to, name string, data map[string]string) error {
 
 	subject := data["subject"]
 	if subject == "" {
-		subject = "Notificación"
+		subject = "Notification"
 	}
 
 	msg := m.buildMessage(to, subject, body.String())
