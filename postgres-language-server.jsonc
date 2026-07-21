@@ -1,0 +1,30 @@
+{
+  "$schema": "https://pg-language-server.com/0.25.5/schema.json",
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "safety": {
+        // DROP TABLE es correcto y esperado en las migraciones .down.sql.
+        "banDropTable": "off"
+      }
+    }
+  },
+  "typecheck": {
+    "enabled": true
+  },
+  "plpgsqlCheck": {
+    "enabled": true
+  },
+  // Conexión a la DB local: habilita validación contra el esquema real
+  // (columnas inexistentes, tipos) mientras editás. Credenciales de dev.
+  "db": {
+    "host": "127.0.0.1",
+    "port": 5433,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "adventist_stack",
+    "connTimeoutSecs": 10,
+    "disableConnection": false
+  }
+}
