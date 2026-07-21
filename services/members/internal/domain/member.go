@@ -92,7 +92,24 @@ func (m Member) Validate() error {
 		validateGender(m.Gender),
 		validateAddress(m.Address),
 		validateStatus(m.Status),
+		validateBirthDate(m.BirthDate),
+		validateBaptismDate(m.BaptismDate),
 	)
+}
+
+func validateBaptismDate(baptismDate *time.Time) error {
+	switch {
+	case baptismDate == nil:
+		return nil
+	case baptismDate.After(time.Now()):
+		return fmt.Errorf("%w: baptism date cannot be in the future", ErrorInvalidMember)
+	default:
+		return nil
+	}
+}
+
+func validateBirthDate(time *time.Time) error {
+	panic("unimplemented")
 }
 
 func validateFirstName(firstName string) error {
