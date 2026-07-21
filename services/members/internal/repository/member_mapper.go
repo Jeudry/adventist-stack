@@ -14,12 +14,16 @@ func toDomain(m db.Member) (domain.Member, error) {
 	if err != nil {
 		return domain.Member{}, fmt.Errorf("repository: rehydrate email: %w", err)
 	}
+	phone, err := vo.NewOptionalPhone(m.Phone)
+	if err != nil {
+		return domain.Member{}, fmt.Errorf("repository: rehydrate phone: %w", err)
+	}
 	return domain.Member{
 		Id:          m.ID,
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		Email:       email,
-		Phone:       m.Phone,
+		Phone:       phone,
 		Gender:      m.Gender,
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
@@ -35,7 +39,7 @@ func toCreateParams(m domain.Member) db.CreateMemberParams {
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
-		Phone:       m.Phone,
+		Phone:       m.Phone.Ptr(),
 		Gender:      m.Gender,
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
@@ -50,7 +54,7 @@ func toUpdateParams(m domain.Member) db.UpdateMemberParams {
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
-		Phone:       m.Phone,
+		Phone:       m.Phone.Ptr(),
 		Gender:      m.Gender,
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,

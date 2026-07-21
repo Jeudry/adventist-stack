@@ -14,8 +14,6 @@ import (
 const (
 	NamesMaxLen     = 256
 	NamesMinLen     = 1
-	PhoneMaxLen     = 20
-	PhoneMinLen     = 7
 	GenderMaxLen    = 1
 	GenderMinLen    = 1
 	AddressMaxLen   = 1024
@@ -31,6 +29,15 @@ const (
 	StatusVisitor  Status = "visitor"
 )
 
+func (s Status) IsValid() bool {
+	switch s {
+	case StatusActive, StatusInactive, StatusVisitor:
+		return true
+	default:
+		return false
+	}
+}
+
 var (
 	ErrMemberNotFound  = errors.New("Member not found")
 	ErrorInvalidMember = errors.New("Member invalid")
@@ -41,7 +48,7 @@ type Member struct {
 	FirstName   string
 	LastName    string
 	Email       vo.Email
-	Phone       *string
+	Phone       vo.Phone
 	Gender      string
 	Address     *string
 	BirthDate   *time.Time
@@ -54,7 +61,6 @@ type Member struct {
 func (m Member) Normalize() Member {
 	m.FirstName = strings.TrimSpace(m.FirstName)
 	m.LastName = strings.TrimSpace(m.LastName)
-	m.Phone = strutil.TrimPtr(m.Phone)
 	m.Gender = strings.TrimSpace(m.Gender)
 	m.Address = strutil.TrimPtr(m.Address)
 
@@ -69,7 +75,6 @@ func (m Member) Validate() error {
 	return errors.Join(
 		validateFirstName(m.FirstName),
 		validateLastName(m.LastName),
-		validatePhone(m.Phone),
 		validateGender(m.Gender),
 		validateAddress(m.Address),
 		validateStatus(m.Status),
@@ -98,18 +103,23 @@ func validateLastName(lastName string) error {
 	return nil
 }
 
-func validatePhone(phone *string) error {
-
-}
-
 func validateGender(gender string) error {
 
 }
 
 func validateAddress(address *string) error {
-
+	switch {
+	case len(*address) < AddressMinLen:
+		return fmt.Errorf("%w: address must be at least %d characters", ErrorInvalidMember, AddressMinLen)
+	case len(*address) > AddressMaxLen:
+		return fmt.Errorf("%w: address must be at most %d characters", ErrorInvalidMember, AddressMaxLen)
+	}
+	return nil
 }
 
 func validateStatus(status Status) error {
-
+	if !status.IsValid() {
+		return fmt.Errorf("%w: invalid status", ErrorInvalidMember)
+	}
+	return nil
 }
