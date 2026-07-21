@@ -14,8 +14,6 @@ import (
 const (
 	NamesMaxLen     = 256
 	NamesMinLen     = 1
-	GenderMaxLen    = 1
-	GenderMinLen    = 1
 	AddressMaxLen   = 1024
 	AddressMinLen   = 5
 	MaxBirthdateAge = 120
@@ -38,6 +36,22 @@ func (s Status) IsValid() bool {
 	}
 }
 
+type Gender string
+
+const (
+	GenderMale   Gender = "M"
+	GenderFemale Gender = "F"
+)
+
+func (g Gender) IsValid() bool {
+	switch g {
+	case GenderMale, GenderFemale:
+		return true
+	default:
+		return false
+	}
+}
+
 var (
 	ErrMemberNotFound  = errors.New("Member not found")
 	ErrorInvalidMember = errors.New("Member invalid")
@@ -49,7 +63,7 @@ type Member struct {
 	LastName    string
 	Email       vo.Email
 	Phone       vo.Phone
-	Gender      string
+	Gender      Gender
 	Address     *string
 	BirthDate   *time.Time
 	BaptismDate *time.Time
@@ -61,7 +75,7 @@ type Member struct {
 func (m Member) Normalize() Member {
 	m.FirstName = strings.TrimSpace(m.FirstName)
 	m.LastName = strings.TrimSpace(m.LastName)
-	m.Gender = strings.TrimSpace(m.Gender)
+	m.Gender = Gender(strings.ToUpper(strings.TrimSpace(string(m.Gender))))
 	m.Address = strutil.TrimPtr(m.Address)
 
 	if m.Status == "" {
@@ -103,8 +117,11 @@ func validateLastName(lastName string) error {
 	return nil
 }
 
-func validateGender(gender string) error {
-
+func validateGender(gender Gender) error {
+	if !gender.IsValid() {
+		return fmt.Errorf("%w: invalid gender", ErrorInvalidMember)
+	}
+	return nil
 }
 
 func validateAddress(address *string) error {
