@@ -38,8 +38,27 @@ func NewEmail(raw string) (Email, error) {
 	return Email{value: normalized}, nil
 }
 
+// NewOptionalEmail builds an Email from an optional raw value: nil or blank
+// yields the zero Email, any other value is validated like NewEmail.
+func NewOptionalEmail(raw *string) (Email, error) {
+	if raw == nil || strings.TrimSpace(*raw) == "" {
+		return Email{}, nil
+	}
+	return NewEmail(*raw)
+}
+
 // String returns the normalized address for persistence and transport.
 func (e Email) String() string { return e.value }
+
+// Ptr returns nil for the zero Email, otherwise a pointer to its value,
+// ready to persist into a nullable column.
+func (e Email) Ptr() *string {
+	if e.IsZero() {
+		return nil
+	}
+	v := e.value
+	return &v
+}
 
 // IsZero reports whether the email is the unset zero value.
 func (e Email) IsZero() bool { return e.value == "" }
