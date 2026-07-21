@@ -23,4 +23,8 @@ type Member struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	Address     *string
+	DeletedAt   *time.Time
+	CreatedBy   *uuid.UUID
+	UpdatedBy   *uuid.UUID
+	DeletedBy   *uuid.UUID
 }

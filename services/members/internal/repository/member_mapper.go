@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 
+	"github.com/Jeudry/adventist-stack/pkg/entity"
 	"github.com/Jeudry/adventist-stack/pkg/pagination"
 	"github.com/Jeudry/adventist-stack/pkg/vo"
 	"github.com/Jeudry/adventist-stack/services/members/internal/db"
@@ -19,7 +20,15 @@ func toDomain(m db.Member) (domain.Member, error) {
 		return domain.Member{}, fmt.Errorf("repository: rehydrate phone: %w", err)
 	}
 	return domain.Member{
-		Id:          m.ID,
+		Base: entity.Base{
+			ID:        m.ID,
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: m.DeletedAt,
+			CreatedBy: m.CreatedBy,
+			UpdatedBy: m.UpdatedBy,
+			DeletedBy: m.DeletedBy,
+		},
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		Email:       email,
@@ -29,8 +38,6 @@ func toDomain(m db.Member) (domain.Member, error) {
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
 		Status:      domain.Status(m.Status),
-		CreatedAt:   m.CreatedAt,
-		UpdatedAt:   m.UpdatedAt,
 	}, nil
 }
 
@@ -50,7 +57,7 @@ func toCreateParams(m domain.Member) db.CreateMemberParams {
 
 func toUpdateParams(m domain.Member) db.UpdateMemberParams {
 	return db.UpdateMemberParams{
-		ID:          m.Id,
+		ID:          m.ID,
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),

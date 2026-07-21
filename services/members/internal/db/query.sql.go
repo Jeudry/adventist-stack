@@ -31,7 +31,7 @@ func (q *Queries) CountMembers(ctx context.Context, search string) (int64, error
 
 const createMember = `-- name: CreateMember :one
 INSERT INTO members (first_name, last_name, email, phone, gender, address, birth_date, baptism_date, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address
+RETURNING id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address, deleted_at, created_by, updated_by, deleted_by
 `
 
 type CreateMemberParams struct {
@@ -72,6 +72,10 @@ func (q *Queries) CreateMember(ctx context.Context, arg CreateMemberParams) (Mem
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Address,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
@@ -89,7 +93,7 @@ func (q *Queries) DeleteMember(ctx context.Context, id uuid.UUID) (int64, error)
 }
 
 const getMemberByID = `-- name: GetMemberByID :one
-SELECT id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address FROM members WHERE id = $1
+SELECT id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address, deleted_at, created_by, updated_by, deleted_by FROM members WHERE id = $1
 `
 
 func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (Member, error) {
@@ -108,12 +112,16 @@ func (q *Queries) GetMemberByID(ctx context.Context, id uuid.UUID) (Member, erro
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Address,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
 
 const listMembers = `-- name: ListMembers :many
-SELECT id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address FROM members WHERE (
+SELECT id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address, deleted_at, created_by, updated_by, deleted_by FROM members WHERE (
     $1::TEXT = ''
     OR first_name ILIKE ('%' || $1 || '%')
     OR last_name ILIKE ('%' || $1 || '%')
@@ -150,6 +158,10 @@ func (q *Queries) ListMembers(ctx context.Context, arg ListMembersParams) ([]Mem
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.Address,
+			&i.DeletedAt,
+			&i.CreatedBy,
+			&i.UpdatedBy,
+			&i.DeletedBy,
 		); err != nil {
 			return nil, err
 		}
@@ -174,7 +186,7 @@ UPDATE members SET
     status = $10,
     updated_at = NOW()
 WHERE id = $1 
-RETURNING id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address
+RETURNING id, first_name, last_name, email, phone, gender, status, birth_date, baptism_date, created_at, updated_at, address, deleted_at, created_by, updated_by, deleted_by
 `
 
 type UpdateMemberParams struct {
@@ -217,6 +229,10 @@ func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Mem
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Address,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }

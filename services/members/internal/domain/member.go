@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Jeudry/adventist-stack/pkg/entity"
 	"github.com/Jeudry/adventist-stack/pkg/strutil"
 	"github.com/Jeudry/adventist-stack/pkg/vo"
-	"github.com/google/uuid"
 )
 
 const (
@@ -16,7 +16,8 @@ const (
 	NamesMinLen     = 1
 	AddressMaxLen   = 1024
 	AddressMinLen   = 5
-	MaxBirthdateAge = 120
+	MaxBirthdateAge = 140
+	MaxBaptismAge   = 130
 )
 
 type Status string
@@ -58,7 +59,7 @@ var (
 )
 
 type Member struct {
-	Id          uuid.UUID
+	entity.Base
 	FirstName   string
 	LastName    string
 	Email       vo.Email
@@ -68,8 +69,6 @@ type Member struct {
 	BirthDate   *time.Time
 	BaptismDate *time.Time
 	Status      Status
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 func (m Member) Normalize() Member {
@@ -91,9 +90,9 @@ func (m Member) Validate() error {
 		validateLastName(m.LastName),
 		validateGender(m.Gender),
 		validateAddress(m.Address),
-		validateStatus(m.Status),
 		validateBirthDate(m.BirthDate),
 		validateBaptismDate(m.BaptismDate),
+		validateStatus(m.Status),
 	)
 }
 
@@ -103,13 +102,24 @@ func validateBaptismDate(baptismDate *time.Time) error {
 		return nil
 	case baptismDate.After(time.Now()):
 		return fmt.Errorf("%w: baptism date cannot be in the future", ErrorInvalidMember)
+	case baptismDate.Before(time.Now().AddDate(-MaxBaptismAge, 0, 0)):
+		return fmt.Errorf("%w: baptism date cannot be more than %d years ago", ErrorInvalidMember, MaxBaptismAge)
 	default:
 		return nil
 	}
 }
 
-func validateBirthDate(time *time.Time) error {
-	panic("unimplemented")
+func validateBirthDate(birthDate *time.Time) error {
+	switch {
+	case birthDate == nil:
+		return nil
+	case birthDate.After(time.Now()):
+		return fmt.Errorf("%w: baptism date cannot be in the future", ErrorInvalidMember)
+	case birthDate.Before(time.Now().AddDate(-MaxBirthdateAge, 0, 0)):
+		return fmt.Errorf("%w: baptism date cannot be more than %d years ago", ErrorInvalidMember, MaxBirthdateAge)
+	default:
+		return nil
+	}
 }
 
 func validateFirstName(firstName string) error {
