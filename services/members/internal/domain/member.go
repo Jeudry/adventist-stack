@@ -2,9 +2,26 @@ package domain
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
+	"github.com/Jeudry/adventist-stack/pkg/strutil"
 	"github.com/google/uuid"
+)
+
+const (
+	NamesMaxLen     = 256
+	NamesMinLen     = 1
+	EmailMaxLen     = 256
+	EmailMinLen     = 5
+	PhoneMaxLen     = 20
+	PhoneMinLen     = 7
+	GenderMaxLen    = 1
+	GenderMinLen    = 1
+	AddressMaxLen   = 1024
+	AddressMinLen   = 5
+	MaxBirthdateAge = 120
 )
 
 type Status string
@@ -15,7 +32,10 @@ const (
 	StatusVisitor  Status = "visitor"
 )
 
-var ErrMemberNotFound = errors.New("miembro no encontrado")
+var (
+	ErrMemberNotFound  = errors.New("Member not found")
+	ErrorInvalidMember = errors.New("Member invalid")
+)
 
 type Member struct {
 	Id          uuid.UUID
@@ -30,4 +50,84 @@ type Member struct {
 	Status      Status
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+}
+
+func (m Member) Normalize() Member {
+	m.FirstName = strings.TrimSpace(m.FirstName)
+	m.LastName = strings.TrimSpace(m.LastName)
+	m.Email = strutil.TrimPtr(m.Email)
+	m.Phone = strutil.TrimPtr(m.Phone)
+	m.Gender = strings.TrimSpace(m.Gender)
+	m.Address = strutil.TrimPtr(m.Address)
+
+	if m.Status == "" {
+		m.Status = StatusActive
+	}
+
+	return m
+}
+
+func (m Member) Validate() error {
+	return errors.Join(
+		validateFirstName(m.FirstName),
+		validateLastName(m.LastName),
+		validateEmail(m.Email),
+		validatePhone(m.Phone),
+		validateGender(m.Gender),
+		validateAddress(m.Address),
+		validateStatus(m.Status),
+	)
+}
+
+func validateFirstName(firstName string) error {
+	switch {
+	case len(firstName) < NamesMinLen:
+		return fmt.Errorf("%w: first name must be at least %d characters", ErrorInvalidMember, NamesMinLen)
+	case len(firstName) > NamesMaxLen:
+		return fmt.Errorf("%w: first name must be at least %d characters", ErrorInvalidMember, NamesMaxLen)
+	}
+
+	return nil
+}
+
+func validateLastName(lastName string) error {
+	switch {
+	case len(lastName) < NamesMinLen:
+		return fmt.Errorf("%w: last name must be at least %d characters", ErrorInvalidMember, NamesMinLen)
+	case len(lastName) > NamesMaxLen:
+		return fmt.Errorf("%w: last name must be at least %d characters", ErrorInvalidMember, NamesMaxLen)
+	}
+
+	return nil
+}
+
+func validateEmail(email *string) error {
+	switch {
+	case email == nil:
+		return nil
+	case *email == "":
+		return nil
+	case len(*email) < EmailMinLen:
+		return fmt.Errorf("%w: email must be at least %d characters", ErrorInvalidMember, EmailMinLen)
+	case len(*email) > EmailMaxLen:
+		return fmt.Errorf("%w: email must be at most %d characters", ErrorInvalidMember, EmailMaxLen)
+	}
+	case validEmail
+	return nil
+}
+
+func validatePhone(phone *string) error {
+
+}
+
+func validateGender(gender string) error {
+
+}
+
+func validateAddress(address *string) error {
+
+}
+
+func validateStatus(status Status) error {
+
 }
