@@ -1,4 +1,3 @@
-// Command server arranca el API Gateway (REST público -> gRPC interno).
 package main
 
 import (
@@ -19,7 +18,6 @@ import (
 	"github.com/Jeudry/adventist-stack/pkg/logger"
 )
 
-// Config del gateway.
 type Config struct {
 	Env               string        `env:"ENV" envDefault:"dev"`
 	HTTPPort          string        `env:"GATEWAY_HTTP_PORT" envDefault:"8080"`
@@ -41,10 +39,9 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Conexiones gRPC hacia los microservicios.
 	grpcClients, err := clients.New(cfg.AuthAddr, cfg.NotificationsAddr)
 	if err != nil {
-		log.Error("no se pudieron crear los clientes gRPC", "err", err)
+		log.Error("failed to create gRPC clients", "err", err)
 		os.Exit(1)
 	}
 	defer grpcClients.Close()
@@ -66,7 +63,7 @@ func main() {
 	}
 
 	go func() {
-		log.Info("gateway escuchando", "port", cfg.HTTPPort, "swagger", "/swagger")
+		log.Info("gateway listening", "port", cfg.HTTPPort, "swagger", "/swagger")
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error("http server", "err", err)
 			os.Exit(1)
@@ -74,7 +71,7 @@ func main() {
 	}()
 
 	<-ctx.Done()
-	log.Info("apagando gateway...")
+	log.Info("shutting down gateway...")
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_ = srv.Shutdown(shutdownCtx)

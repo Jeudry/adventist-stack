@@ -1,4 +1,3 @@
-// Command server arranca el microservicio de notificaciones (servidor gRPC).
 package main
 
 import (
@@ -22,7 +21,6 @@ import (
 	"github.com/Jeudry/adventist-stack/services/notifications/internal/service"
 )
 
-// Config del servicio de notificaciones.
 type Config struct {
 	Env      string `env:"ENV" envDefault:"dev"`
 	GRPCPort string `env:"NOTIFICATIONS_GRPC_PORT" envDefault:"50052"`
@@ -40,37 +38,34 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Redis (cache + pub/sub).
 	rdb, err := redis.Connect(ctx, cfg.Redis.Addr, cfg.Redis.Password, cfg.Redis.DB)
 	if err != nil {
-		log.Error("no se pudo conectar a redis", "err", err)
+		log.Error("failed to connect to redis", "err", err)
 		os.Exit(1)
 	}
 	defer rdb.Close()
 
-	// Plantillas de correo embebidas.
 	tmpl, err := template.ParseFS(notifications.TemplatesFS, "templates/*.html")
 	if err != nil {
-		log.Error("no se pudieron parsear las plantillas", "err", err)
+		log.Error("failed to parse templates", "err", err)
 		os.Exit(1)
 	}
 	mail := mailer.New(cfg.SMTP.Host, cfg.SMTP.Port, cfg.SMTP.User, cfg.SMTP.Pass, cfg.SMTP.From, tmpl)
 
 	svc := service.New(mail, rdb)
 
-	// Servidor gRPC.
 	grpcServer := grpc.NewServer()
 	notificationsv1.RegisterNotificationServiceServer(grpcServer, notifgrpc.NewServer(svc))
 	reflection.Register(grpcServer)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
-		log.Error("no se pudo escuchar", "port", cfg.GRPCPort, "err", err)
+		log.Error("failed to listen", "port", cfg.GRPCPort, "err", err)
 		os.Exit(1)
 	}
 
 	go func() {
-		log.Info("servicio notifications escuchando", "port", cfg.GRPCPort)
+		log.Info("notifications service listening", "port", cfg.GRPCPort)
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Error("grpc server", "err", err)
 			os.Exit(1)
@@ -78,6 +73,6 @@ func main() {
 	}()
 
 	<-ctx.Done()
-	log.Info("apagando servicio notifications...")
+	log.Info("shutting down notifications service...")
 	grpcServer.GracefulStop()
 }

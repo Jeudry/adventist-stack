@@ -1,5 +1,3 @@
-// Package api expone la especificación OpenAPI y el HTML de Swagger UI
-// embebidos, para que el gateway los sirva sin archivos externos.
 package api
 
 import _ "embed"

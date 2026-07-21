@@ -1,5 +1,3 @@
-// Package clients agrupa las conexiones gRPC del gateway hacia los
-// microservicios backend.
 package clients
 
 import (
@@ -12,7 +10,6 @@ import (
 	notificationsv1 "github.com/Jeudry/adventist-stack/gen/notifications/v1"
 )
 
-// Clients contiene los stubs gRPC de cada servicio y sus conexiones.
 type Clients struct {
 	Auth          authv1.AuthServiceClient
 	Notifications notificationsv1.NotificationServiceClient
@@ -20,10 +17,6 @@ type Clients struct {
 	conns []*grpc.ClientConn
 }
 
-// New crea las conexiones gRPC hacia auth y notifications.
-//
-// Nota: usa credenciales inseguras porque el tráfico entre gateway y servicios
-// vive en la red interna del cluster. En producción con mTLS, cambiar aquí.
 func New(authAddr, notificationsAddr string) (*Clients, error) {
 	authConn, err := dial(authAddr)
 	if err != nil {
@@ -43,7 +36,6 @@ func New(authAddr, notificationsAddr string) (*Clients, error) {
 	}, nil
 }
 
-// Close cierra todas las conexiones gRPC.
 func (c *Clients) Close() {
 	for _, conn := range c.conns {
 		_ = conn.Close()

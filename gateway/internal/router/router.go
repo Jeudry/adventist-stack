@@ -1,5 +1,3 @@
-// Package router construye el router HTTP del gateway: middlewares globales,
-// rutas públicas y protegidas, y Swagger UI.
 package router
 
 import (
@@ -15,7 +13,6 @@ import (
 	"github.com/Jeudry/adventist-stack/pkg/middleware"
 )
 
-// Deps son las dependencias que el router necesita.
 type Deps struct {
 	JWT            *jwt.Manager
 	AuthHandler    *handlers.AuthHandler
@@ -24,11 +21,9 @@ type Deps struct {
 	RateWindow     time.Duration
 }
 
-// New arma el http.Handler completo.
 func New(d Deps) http.Handler {
 	r := chi.NewRouter()
 
-	// Middlewares globales.
 	r.Use(chimw.RequestID)
 	r.Use(chimw.RealIP)
 	r.Use(chimw.Recoverer)
@@ -36,10 +31,8 @@ func New(d Deps) http.Handler {
 	r.Use(middleware.CORS(d.AllowedOrigins))
 	r.Use(middleware.RateLimit(d.RateLimit, d.RateWindow))
 
-	// Salud.
 	r.Get("/health", handlers.Health)
 
-	// Swagger UI + spec.
 	r.Get("/swagger", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		_, _ = w.Write(api.SwaggerHTML)
@@ -49,13 +42,10 @@ func New(d Deps) http.Handler {
 		_, _ = w.Write(api.OpenAPISpec)
 	})
 
-	// API v1.
 	r.Route("/api/v1", func(r chi.Router) {
-		// Público.
 		r.Post("/auth/register", d.AuthHandler.Register)
 		r.Post("/auth/login", d.AuthHandler.Login)
 
-		// Protegido (requiere JWT válido).
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.Auth(d.JWT))
 			r.Get("/me", handlers.Me(
