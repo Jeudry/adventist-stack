@@ -1,4 +1,3 @@
-// Command server arranca el microservicio auth (servidor gRPC).
 package main
 
 import (
@@ -22,7 +21,6 @@ import (
 	"github.com/Jeudry/adventist-stack/services/auth/internal/service"
 )
 
-// Config del servicio auth.
 type Config struct {
 	Env      string `env:"ENV" envDefault:"dev"`
 	GRPCPort string `env:"AUTH_GRPC_PORT" envDefault:"50051"`
@@ -40,36 +38,32 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Migraciones.
 	if cfg.Postgres.AutoMigrate {
 		if err := database.Migrate(cfg.Postgres.DSN, "auth_schema_migrations", auth.MigrationsFS, "migrations"); err != nil {
-			log.Error("migraciones fallaron", "err", err)
+			log.Error("migrations failed", "err", err)
 			os.Exit(1)
 		}
-		log.Info("migraciones aplicadas")
+		log.Info("migrations applied")
 	}
 
-	// Base de datos.
 	pool, err := database.Connect(ctx, cfg.Postgres.DSN)
 	if err != nil {
-		log.Error("no se pudo conectar a postgres", "err", err)
+		log.Error("failed to connect to postgres", "err", err)
 		os.Exit(1)
 	}
 	defer pool.Close()
 
-	// Dependencias.
 	jwtManager := jwt.NewManager(cfg.JWT.Secret, cfg.JWT.Issuer, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
 	repo := repository.NewUserRepository(pool)
 	svc := service.New(repo, jwtManager)
 
-	// Servidor gRPC.
 	grpcServer := grpc.NewServer()
 	authv1.RegisterAuthServiceServer(grpcServer, authgrpc.NewServer(svc))
 	reflection.Register(grpcServer)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
 	if err != nil {
-		log.Error("no se pudo escuchar", "port", cfg.GRPCPort, "err", err)
+		log.Error("failed to listen", "port", cfg.GRPCPort, "err", err)
 		os.Exit(1)
 	}
 
@@ -82,6 +76,6 @@ func main() {
 	}()
 
 	<-ctx.Done()
-	log.Info("apagando servicio auth...")
+	log.Info("shutting down auth service...")
 	grpcServer.GracefulStop()
 }
