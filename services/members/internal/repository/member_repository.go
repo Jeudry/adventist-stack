@@ -28,7 +28,7 @@ func (r *MemberRepository) Create(ctx context.Context, m domain.Member) (domain.
 		return domain.Member{}, fmt.Errorf("repository: create member: %w", err)
 	}
 
-	return toDomain(created), nil
+	return toDomain(created)
 }
 
 func (r *MemberRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Member, error) {
@@ -40,7 +40,7 @@ func (r *MemberRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Me
 		return domain.Member{}, fmt.Errorf("repository: get member: %w", err)
 	}
 
-	return toDomain(p), nil
+	return toDomain(p)
 }
 
 func (r *MemberRepository) RetrieveList(ctx context.Context, q pagination.Query) ([]domain.Member, error) {
@@ -51,7 +51,11 @@ func (r *MemberRepository) RetrieveList(ctx context.Context, q pagination.Query)
 
 	out := make([]domain.Member, len(rows))
 	for i, row := range rows {
-		out[i] = toDomain(row)
+		member, err := toDomain(row)
+		if err != nil {
+			return nil, err
+		}
+		out[i] = member
 	}
 	return out, nil
 }
@@ -73,7 +77,7 @@ func (r *MemberRepository) Update(ctx context.Context, m domain.Member) (domain.
 	if err != nil {
 		return domain.Member{}, fmt.Errorf("repository: update member: %w", err)
 	}
-	return toDomain(updated), nil
+	return toDomain(updated)
 }
 
 func (r *MemberRepository) Delete(ctx context.Context, id uuid.UUID) error {

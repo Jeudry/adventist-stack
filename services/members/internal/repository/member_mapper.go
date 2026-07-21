@@ -1,17 +1,24 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/Jeudry/adventist-stack/pkg/pagination"
+	"github.com/Jeudry/adventist-stack/pkg/vo"
 	"github.com/Jeudry/adventist-stack/services/members/internal/db"
 	"github.com/Jeudry/adventist-stack/services/members/internal/domain"
 )
 
-func toDomain(m db.Member) domain.Member {
+func toDomain(m db.Member) (domain.Member, error) {
+	email, err := vo.NewOptionalEmail(m.Email)
+	if err != nil {
+		return domain.Member{}, fmt.Errorf("repository: rehydrate email: %w", err)
+	}
 	return domain.Member{
 		Id:          m.ID,
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
-		Email:       m.Email,
+		Email:       email,
 		Phone:       m.Phone,
 		Gender:      m.Gender,
 		Address:     m.Address,
@@ -20,14 +27,14 @@ func toDomain(m db.Member) domain.Member {
 		Status:      domain.Status(m.Status),
 		CreatedAt:   m.CreatedAt,
 		UpdatedAt:   m.UpdatedAt,
-	}
+	}, nil
 }
 
 func toCreateParams(m domain.Member) db.CreateMemberParams {
 	return db.CreateMemberParams{
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
-		Email:       m.Email,
+		Email:       m.Email.Ptr(),
 		Phone:       m.Phone,
 		Gender:      m.Gender,
 		Address:     m.Address,
@@ -42,7 +49,7 @@ func toUpdateParams(m domain.Member) db.UpdateMemberParams {
 		ID:          m.Id,
 		FirstName:   m.FirstName,
 		LastName:    m.LastName,
-		Email:       m.Email,
+		Email:       m.Email.Ptr(),
 		Phone:       m.Phone,
 		Gender:      m.Gender,
 		Address:     m.Address,

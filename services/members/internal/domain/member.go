@@ -7,14 +7,13 @@ import (
 	"time"
 
 	"github.com/Jeudry/adventist-stack/pkg/strutil"
+	"github.com/Jeudry/adventist-stack/pkg/vo"
 	"github.com/google/uuid"
 )
 
 const (
 	NamesMaxLen     = 256
 	NamesMinLen     = 1
-	EmailMaxLen     = 256
-	EmailMinLen     = 5
 	PhoneMaxLen     = 20
 	PhoneMinLen     = 7
 	GenderMaxLen    = 1
@@ -41,7 +40,7 @@ type Member struct {
 	Id          uuid.UUID
 	FirstName   string
 	LastName    string
-	Email       *string
+	Email       vo.Email
 	Phone       *string
 	Gender      string
 	Address     *string
@@ -55,7 +54,6 @@ type Member struct {
 func (m Member) Normalize() Member {
 	m.FirstName = strings.TrimSpace(m.FirstName)
 	m.LastName = strings.TrimSpace(m.LastName)
-	m.Email = strutil.TrimPtr(m.Email)
 	m.Phone = strutil.TrimPtr(m.Phone)
 	m.Gender = strings.TrimSpace(m.Gender)
 	m.Address = strutil.TrimPtr(m.Address)
@@ -71,7 +69,6 @@ func (m Member) Validate() error {
 	return errors.Join(
 		validateFirstName(m.FirstName),
 		validateLastName(m.LastName),
-		validateEmail(m.Email),
 		validatePhone(m.Phone),
 		validateGender(m.Gender),
 		validateAddress(m.Address),
@@ -98,21 +95,6 @@ func validateLastName(lastName string) error {
 		return fmt.Errorf("%w: last name must be at least %d characters", ErrorInvalidMember, NamesMaxLen)
 	}
 
-	return nil
-}
-
-func validateEmail(email *string) error {
-	switch {
-	case email == nil:
-		return nil
-	case *email == "":
-		return nil
-	case len(*email) < EmailMinLen:
-		return fmt.Errorf("%w: email must be at least %d characters", ErrorInvalidMember, EmailMinLen)
-	case len(*email) > EmailMaxLen:
-		return fmt.Errorf("%w: email must be at most %d characters", ErrorInvalidMember, EmailMaxLen)
-	}
-	case validEmail
 	return nil
 }
 
