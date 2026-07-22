@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"errors"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -10,6 +9,7 @@ import (
 
 	productsv1 "github.com/Jeudry/adventist-stack/gen/products/v1"
 	"github.com/Jeudry/adventist-stack/pkg/entity"
+	"github.com/Jeudry/adventist-stack/pkg/protoconv"
 	"github.com/Jeudry/adventist-stack/services/products/internal/domain"
 	"github.com/google/uuid"
 )
@@ -20,7 +20,7 @@ func productFromCreate(req *productsv1.CreateProductRequest) domain.Product {
 		Sku:         req.Sku,
 		Description: req.Description,
 		Brand:       req.Brand,
-		ReleaseDate: tsToPtr(req.ReleaseDate),
+		ReleaseDate: protoconv.TimeFromProto(req.ReleaseDate),
 		Status:      statusFromProto(req.Status),
 	}
 }
@@ -32,7 +32,7 @@ func productFromUpdate(req *productsv1.UpdateProductRequest, id uuid.UUID) domai
 		Sku:         req.Sku,
 		Description: req.Description,
 		Brand:       req.Brand,
-		ReleaseDate: tsToPtr(req.ReleaseDate),
+		ReleaseDate: protoconv.TimeFromProto(req.ReleaseDate),
 		Status:      statusFromProto(req.Status),
 	}
 }
@@ -44,7 +44,7 @@ func productToProto(p domain.Product) *productsv1.Product {
 		Sku:         p.Sku,
 		Description: p.Description,
 		Brand:       p.Brand,
-		ReleaseDate: ptrToTs(p.ReleaseDate),
+		ReleaseDate: protoconv.TimeToProto(p.ReleaseDate),
 		Status:      statusToProto(p.Status),
 		CreatedAt:   timestamppb.New(p.CreatedAt),
 		UpdatedAt:   timestamppb.New(p.UpdatedAt),
@@ -71,28 +71,6 @@ func statusToProto(s domain.Status) productsv1.ProductStatus {
 	default:
 		return productsv1.ProductStatus_PRODUCT_STATUS_ACTIVE
 	}
-}
-
-func tsToPtr(ts *timestamppb.Timestamp) *time.Time {
-	if ts == nil {
-		return nil
-	}
-	t := ts.AsTime()
-	return &t
-}
-
-func ptrToTs(t *time.Time) *timestamppb.Timestamp {
-	if t == nil {
-		return nil
-	}
-	return timestamppb.New(*t)
-}
-
-func deref(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
 }
 
 func toStatus(err error) error {

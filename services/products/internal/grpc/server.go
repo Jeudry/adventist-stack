@@ -8,6 +8,7 @@ import (
 
 	productsv1 "github.com/Jeudry/adventist-stack/gen/products/v1"
 	"github.com/Jeudry/adventist-stack/pkg/pagination"
+	"github.com/Jeudry/adventist-stack/pkg/ptr"
 	"github.com/Jeudry/adventist-stack/services/products/internal/service"
 	"github.com/google/uuid"
 )
@@ -45,7 +46,7 @@ func (s *Server) ListProducts(ctx context.Context, req *productsv1.ListProductsR
 	page, err := s.svc.List(ctx, pagination.ListRequest{
 		Page:     int(req.Page),
 		PageSize: int(req.PageSize),
-		Search:   deref(req.Search),
+		Search:   ptr.Deref(req.Search),
 	})
 	if err != nil {
 		return nil, toStatus(err)
