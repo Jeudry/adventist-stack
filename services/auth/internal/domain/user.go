@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/Jeudry/adventist-stack/pkg/entity"
 	"github.com/Jeudry/adventist-stack/pkg/vo"
 )
 
@@ -40,7 +40,7 @@ func (r Role) IsValid() bool {
 }
 
 type User struct {
-	ID           uuid.UUID
+	entity.Base
 	Email        vo.Email
 	Name         string
 	PasswordHash string

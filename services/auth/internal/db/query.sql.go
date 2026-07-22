@@ -12,7 +12,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, name, password_hash, role)
 VALUES ($1, $2, $3, $4)
-RETURNING id, email, name, password_hash, role, created_at, updated_at
+RETURNING id, email, name, password_hash, role, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by
 `
 
 type CreateUserParams struct {
@@ -38,6 +38,10 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
@@ -54,7 +58,7 @@ func (q *Queries) ExistsUserByEmail(ctx context.Context, email string) (bool, er
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, name, password_hash, role, created_at, updated_at FROM users WHERE email = $1
+SELECT id, email, name, password_hash, role, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -68,6 +72,10 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Role,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
