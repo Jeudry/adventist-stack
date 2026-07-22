@@ -31,7 +31,7 @@ func (q *Queries) CountProducts(ctx context.Context, search string) (int64, erro
 const createProduct = `-- name: CreateProduct :one
 INSERT INTO products (name, sku, description, brand, release_date, status)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, name, sku, description, brand, release_date, status, created_at, updated_at
+RETURNING id, name, sku, description, brand, release_date, status, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by
 `
 
 type CreateProductParams struct {
@@ -63,6 +63,10 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
@@ -80,7 +84,7 @@ func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) (int64, error
 }
 
 const getProductByID = `-- name: GetProductByID :one
-SELECT id, name, sku, description, brand, release_date, status, created_at, updated_at FROM products WHERE id = $1
+SELECT id, name, sku, description, brand, release_date, status, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by FROM products WHERE id = $1
 `
 
 func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, error) {
@@ -96,16 +100,20 @@ func (q *Queries) GetProductByID(ctx context.Context, id uuid.UUID) (Product, er
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }
 
 const listProducts = `-- name: ListProducts :many
-SELECT id, name, sku, description, brand, release_date, status, created_at, updated_at FROM products
+SELECT id, name, sku, description, brand, release_date, status, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by FROM products
 WHERE (
     $1::text = ''
-    OR name ILIKE '%' || $1 || '%'
-    OR sku  ILIKE '%' || $1 || '%'
+    OR name ILIKE ('%' || $1 || '%')
+    OR sku  ILIKE ('%' || $1 || '%')
 )
 ORDER BY created_at DESC
 LIMIT $3 OFFSET $2
@@ -136,6 +144,10 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]P
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.CreatedBy,
+			&i.UpdatedBy,
+			&i.DeletedBy,
 		); err != nil {
 			return nil, err
 		}
@@ -152,7 +164,7 @@ UPDATE products SET
     name = $2, sku = $3, description = $4, brand = $5,
     release_date = $6, status = $7, updated_at = now()
 WHERE id = $1
-RETURNING id, name, sku, description, brand, release_date, status, created_at, updated_at
+RETURNING id, name, sku, description, brand, release_date, status, created_at, updated_at, deleted_at, created_by, updated_by, deleted_by
 `
 
 type UpdateProductParams struct {
@@ -186,6 +198,10 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		&i.Status,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
 	)
 	return i, err
 }

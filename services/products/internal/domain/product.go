@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/Jeudry/adventist-stack/pkg/entity"
 )
 
 type Status string
@@ -37,15 +37,13 @@ const (
 )
 
 type Product struct {
-	Id          uuid.UUID
+	entity.Base
 	Name        string
 	Sku         string
 	Description *string
 	Brand       *string
 	ReleaseDate *time.Time
 	Status      Status
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 func (p Product) Normalize() Product {

@@ -55,7 +55,7 @@ func (s *ProductService) List(ctx context.Context, req pagination.ListRequest) (
 }
 
 func (s *ProductService) Update(ctx context.Context, p domain.Product) (domain.Product, error) {
-	if p.Id == uuid.Nil {
+	if p.ID == uuid.Nil {
 		return domain.Product{}, fmt.Errorf("%w: id is required", domain.ErrInvalidProduct)
 	}
 	p = p.Normalize()

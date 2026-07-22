@@ -1,7 +1,9 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    schema: "migrations/000001_create_products_table.up.sql"
+    schema:
+      - "migrations/000001_create_products_table.up.sql"
+      - "migrations/000002_add_audit_columns.up.sql"
     queries: "query.sql"
     gen:
       go:
@@ -12,10 +14,22 @@ sql:
         overrides:
           - db_type: "uuid"
             go_type: "github.com/google/uuid.UUID"
+          - db_type: "uuid"
+            nullable: true
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+              pointer: true
           - db_type: "timestamptz"
             go_type:
               import: "time"
               type: "Time"
+          - db_type: "timestamptz"
+            nullable: true
+            go_type:
+              import: "time"
+              type: "Time"
+              pointer: true
           - db_type: "date"
             nullable: true
             go_type:
