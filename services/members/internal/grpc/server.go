@@ -24,7 +24,7 @@ func NewServer(svc *service.MemberService) *Server {
 	return &Server{svc: svc}
 }
 
-func (s *Server) CreateMember(ctx context.Context, req *membersv1.CreateMemberRequest) (*membersv1.CreateMemberResponse, error) {
+func (s *Server) CreateMember(ctx context.Context, req *membersv1.CreateMemberRequest) (*membersv1.Member, error) {
 	member, err := memberFromCreate(req)
 	if err != nil {
 		return nil, toStatus(err)
@@ -33,10 +33,10 @@ func (s *Server) CreateMember(ctx context.Context, req *membersv1.CreateMemberRe
 	if err != nil {
 		return nil, toStatus(err)
 	}
-	return &membersv1.CreateMemberResponse{Member: memberToProto(created)}, nil
+	return memberToProto(created), nil
 }
 
-func (s *Server) GetMember(ctx context.Context, req *membersv1.GetMemberRequest) (*membersv1.GetMemberResponse, error) {
+func (s *Server) GetMember(ctx context.Context, req *membersv1.GetMemberRequest) (*membersv1.Member, error) {
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid id")
@@ -45,7 +45,7 @@ func (s *Server) GetMember(ctx context.Context, req *membersv1.GetMemberRequest)
 	if err != nil {
 		return nil, toStatus(err)
 	}
-	return &membersv1.GetMemberResponse{Member: memberToProto(found)}, nil
+	return memberToProto(found), nil
 }
 
 func (s *Server) ListMembers(ctx context.Context, req *membersv1.ListMembersRequest) (*membersv1.ListMembersResponse, error) {
@@ -69,7 +69,7 @@ func (s *Server) ListMembers(ctx context.Context, req *membersv1.ListMembersRequ
 	}, nil
 }
 
-func (s *Server) UpdateMember(ctx context.Context, req *membersv1.UpdateMemberRequest) (*membersv1.UpdateMemberResponse, error) {
+func (s *Server) UpdateMember(ctx context.Context, req *membersv1.UpdateMemberRequest) (*membersv1.Member, error) {
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid id")
@@ -82,7 +82,7 @@ func (s *Server) UpdateMember(ctx context.Context, req *membersv1.UpdateMemberRe
 	if err != nil {
 		return nil, toStatus(err)
 	}
-	return &membersv1.UpdateMemberResponse{Member: memberToProto(updated)}, nil
+	return memberToProto(updated), nil
 }
 
 func (s *Server) DeleteMember(ctx context.Context, req *membersv1.DeleteMemberRequest) (*membersv1.DeleteMemberResponse, error) {

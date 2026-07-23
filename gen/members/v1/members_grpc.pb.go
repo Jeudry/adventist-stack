@@ -32,10 +32,10 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MemberServiceClient interface {
-	CreateMember(ctx context.Context, in *CreateMemberRequest, opts ...grpc.CallOption) (*CreateMemberResponse, error)
-	GetMember(ctx context.Context, in *GetMemberRequest, opts ...grpc.CallOption) (*GetMemberResponse, error)
+	CreateMember(ctx context.Context, in *CreateMemberRequest, opts ...grpc.CallOption) (*Member, error)
+	GetMember(ctx context.Context, in *GetMemberRequest, opts ...grpc.CallOption) (*Member, error)
 	ListMembers(ctx context.Context, in *ListMembersRequest, opts ...grpc.CallOption) (*ListMembersResponse, error)
-	UpdateMember(ctx context.Context, in *UpdateMemberRequest, opts ...grpc.CallOption) (*UpdateMemberResponse, error)
+	UpdateMember(ctx context.Context, in *UpdateMemberRequest, opts ...grpc.CallOption) (*Member, error)
 	DeleteMember(ctx context.Context, in *DeleteMemberRequest, opts ...grpc.CallOption) (*DeleteMemberResponse, error)
 }
 
@@ -47,9 +47,9 @@ func NewMemberServiceClient(cc grpc.ClientConnInterface) MemberServiceClient {
 	return &memberServiceClient{cc}
 }
 
-func (c *memberServiceClient) CreateMember(ctx context.Context, in *CreateMemberRequest, opts ...grpc.CallOption) (*CreateMemberResponse, error) {
+func (c *memberServiceClient) CreateMember(ctx context.Context, in *CreateMemberRequest, opts ...grpc.CallOption) (*Member, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateMemberResponse)
+	out := new(Member)
 	err := c.cc.Invoke(ctx, MemberService_CreateMember_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -57,9 +57,9 @@ func (c *memberServiceClient) CreateMember(ctx context.Context, in *CreateMember
 	return out, nil
 }
 
-func (c *memberServiceClient) GetMember(ctx context.Context, in *GetMemberRequest, opts ...grpc.CallOption) (*GetMemberResponse, error) {
+func (c *memberServiceClient) GetMember(ctx context.Context, in *GetMemberRequest, opts ...grpc.CallOption) (*Member, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetMemberResponse)
+	out := new(Member)
 	err := c.cc.Invoke(ctx, MemberService_GetMember_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -77,9 +77,9 @@ func (c *memberServiceClient) ListMembers(ctx context.Context, in *ListMembersRe
 	return out, nil
 }
 
-func (c *memberServiceClient) UpdateMember(ctx context.Context, in *UpdateMemberRequest, opts ...grpc.CallOption) (*UpdateMemberResponse, error) {
+func (c *memberServiceClient) UpdateMember(ctx context.Context, in *UpdateMemberRequest, opts ...grpc.CallOption) (*Member, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateMemberResponse)
+	out := new(Member)
 	err := c.cc.Invoke(ctx, MemberService_UpdateMember_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -101,10 +101,10 @@ func (c *memberServiceClient) DeleteMember(ctx context.Context, in *DeleteMember
 // All implementations must embed UnimplementedMemberServiceServer
 // for forward compatibility.
 type MemberServiceServer interface {
-	CreateMember(context.Context, *CreateMemberRequest) (*CreateMemberResponse, error)
-	GetMember(context.Context, *GetMemberRequest) (*GetMemberResponse, error)
+	CreateMember(context.Context, *CreateMemberRequest) (*Member, error)
+	GetMember(context.Context, *GetMemberRequest) (*Member, error)
 	ListMembers(context.Context, *ListMembersRequest) (*ListMembersResponse, error)
-	UpdateMember(context.Context, *UpdateMemberRequest) (*UpdateMemberResponse, error)
+	UpdateMember(context.Context, *UpdateMemberRequest) (*Member, error)
 	DeleteMember(context.Context, *DeleteMemberRequest) (*DeleteMemberResponse, error)
 	mustEmbedUnimplementedMemberServiceServer()
 }
@@ -116,16 +116,16 @@ type MemberServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMemberServiceServer struct{}
 
-func (UnimplementedMemberServiceServer) CreateMember(context.Context, *CreateMemberRequest) (*CreateMemberResponse, error) {
+func (UnimplementedMemberServiceServer) CreateMember(context.Context, *CreateMemberRequest) (*Member, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateMember not implemented")
 }
-func (UnimplementedMemberServiceServer) GetMember(context.Context, *GetMemberRequest) (*GetMemberResponse, error) {
+func (UnimplementedMemberServiceServer) GetMember(context.Context, *GetMemberRequest) (*Member, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetMember not implemented")
 }
 func (UnimplementedMemberServiceServer) ListMembers(context.Context, *ListMembersRequest) (*ListMembersResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListMembers not implemented")
 }
-func (UnimplementedMemberServiceServer) UpdateMember(context.Context, *UpdateMemberRequest) (*UpdateMemberResponse, error) {
+func (UnimplementedMemberServiceServer) UpdateMember(context.Context, *UpdateMemberRequest) (*Member, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateMember not implemented")
 }
 func (UnimplementedMemberServiceServer) DeleteMember(context.Context, *DeleteMemberRequest) (*DeleteMemberResponse, error) {

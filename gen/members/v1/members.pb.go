@@ -323,50 +323,6 @@ func (x *CreateMemberRequest) GetStatus() MemberStatus {
 	return MemberStatus_MEMBER_STATUS_UNSPECIFIED
 }
 
-type CreateMemberResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateMemberResponse) Reset() {
-	*x = CreateMemberResponse{}
-	mi := &file_members_v1_members_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateMemberResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateMemberResponse) ProtoMessage() {}
-
-func (x *CreateMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateMemberResponse.ProtoReflect.Descriptor instead.
-func (*CreateMemberResponse) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *CreateMemberResponse) GetMember() *Member {
-	if x != nil {
-		return x.Member
-	}
-	return nil
-}
-
 type GetMemberRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -376,7 +332,7 @@ type GetMemberRequest struct {
 
 func (x *GetMemberRequest) Reset() {
 	*x = GetMemberRequest{}
-	mi := &file_members_v1_members_proto_msgTypes[3]
+	mi := &file_members_v1_members_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -388,7 +344,7 @@ func (x *GetMemberRequest) String() string {
 func (*GetMemberRequest) ProtoMessage() {}
 
 func (x *GetMemberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[3]
+	mi := &file_members_v1_members_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +357,7 @@ func (x *GetMemberRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMemberRequest.ProtoReflect.Descriptor instead.
 func (*GetMemberRequest) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{3}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetMemberRequest) GetId() string {
@@ -409,50 +365,6 @@ func (x *GetMemberRequest) GetId() string {
 		return x.Id
 	}
 	return ""
-}
-
-type GetMemberResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetMemberResponse) Reset() {
-	*x = GetMemberResponse{}
-	mi := &file_members_v1_members_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetMemberResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetMemberResponse) ProtoMessage() {}
-
-func (x *GetMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetMemberResponse.ProtoReflect.Descriptor instead.
-func (*GetMemberResponse) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetMemberResponse) GetMember() *Member {
-	if x != nil {
-		return x.Member
-	}
-	return nil
 }
 
 type UpdateMemberRequest struct {
@@ -473,7 +385,7 @@ type UpdateMemberRequest struct {
 
 func (x *UpdateMemberRequest) Reset() {
 	*x = UpdateMemberRequest{}
-	mi := &file_members_v1_members_proto_msgTypes[5]
+	mi := &file_members_v1_members_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -485,7 +397,7 @@ func (x *UpdateMemberRequest) String() string {
 func (*UpdateMemberRequest) ProtoMessage() {}
 
 func (x *UpdateMemberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[5]
+	mi := &file_members_v1_members_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -498,7 +410,7 @@ func (x *UpdateMemberRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMemberRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMemberRequest) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{5}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UpdateMemberRequest) GetId() string {
@@ -571,50 +483,6 @@ func (x *UpdateMemberRequest) GetStatus() MemberStatus {
 	return MemberStatus_MEMBER_STATUS_UNSPECIFIED
 }
 
-type UpdateMemberResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Member        *Member                `protobuf:"bytes,1,opt,name=member,proto3" json:"member,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateMemberResponse) Reset() {
-	*x = UpdateMemberResponse{}
-	mi := &file_members_v1_members_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateMemberResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateMemberResponse) ProtoMessage() {}
-
-func (x *UpdateMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateMemberResponse.ProtoReflect.Descriptor instead.
-func (*UpdateMemberResponse) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpdateMemberResponse) GetMember() *Member {
-	if x != nil {
-		return x.Member
-	}
-	return nil
-}
-
 type DeleteMemberRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -624,7 +492,7 @@ type DeleteMemberRequest struct {
 
 func (x *DeleteMemberRequest) Reset() {
 	*x = DeleteMemberRequest{}
-	mi := &file_members_v1_members_proto_msgTypes[7]
+	mi := &file_members_v1_members_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -636,7 +504,7 @@ func (x *DeleteMemberRequest) String() string {
 func (*DeleteMemberRequest) ProtoMessage() {}
 
 func (x *DeleteMemberRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[7]
+	mi := &file_members_v1_members_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -649,7 +517,7 @@ func (x *DeleteMemberRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemberRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMemberRequest) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{7}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeleteMemberRequest) GetId() string {
@@ -668,7 +536,7 @@ type DeleteMemberResponse struct {
 
 func (x *DeleteMemberResponse) Reset() {
 	*x = DeleteMemberResponse{}
-	mi := &file_members_v1_members_proto_msgTypes[8]
+	mi := &file_members_v1_members_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -680,7 +548,7 @@ func (x *DeleteMemberResponse) String() string {
 func (*DeleteMemberResponse) ProtoMessage() {}
 
 func (x *DeleteMemberResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[8]
+	mi := &file_members_v1_members_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -693,7 +561,7 @@ func (x *DeleteMemberResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemberResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemberResponse) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{8}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DeleteMemberResponse) GetDeleted() bool {
@@ -714,7 +582,7 @@ type ListMembersRequest struct {
 
 func (x *ListMembersRequest) Reset() {
 	*x = ListMembersRequest{}
-	mi := &file_members_v1_members_proto_msgTypes[9]
+	mi := &file_members_v1_members_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -726,7 +594,7 @@ func (x *ListMembersRequest) String() string {
 func (*ListMembersRequest) ProtoMessage() {}
 
 func (x *ListMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[9]
+	mi := &file_members_v1_members_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +607,7 @@ func (x *ListMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMembersRequest.ProtoReflect.Descriptor instead.
 func (*ListMembersRequest) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{9}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListMembersRequest) GetPage() int32 {
@@ -775,7 +643,7 @@ type ListMembersResponse struct {
 
 func (x *ListMembersResponse) Reset() {
 	*x = ListMembersResponse{}
-	mi := &file_members_v1_members_proto_msgTypes[10]
+	mi := &file_members_v1_members_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -787,7 +655,7 @@ func (x *ListMembersResponse) String() string {
 func (*ListMembersResponse) ProtoMessage() {}
 
 func (x *ListMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_members_v1_members_proto_msgTypes[10]
+	mi := &file_members_v1_members_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -800,7 +668,7 @@ func (x *ListMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMembersResponse.ProtoReflect.Descriptor instead.
 func (*ListMembersResponse) Descriptor() ([]byte, []int) {
-	return file_members_v1_members_proto_rawDescGZIP(), []int{10}
+	return file_members_v1_members_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListMembersResponse) GetItems() []*Member {
@@ -874,13 +742,9 @@ const file_members_v1_members_proto_rawDesc = "" +
 	"\x06_emailB\b\n" +
 	"\x06_phoneB\n" +
 	"\n" +
-	"\b_address\"B\n" +
-	"\x14CreateMemberResponse\x12*\n" +
-	"\x06member\x18\x01 \x01(\v2\x12.members.v1.MemberR\x06member\"\"\n" +
+	"\b_address\"\"\n" +
 	"\x10GetMemberRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"?\n" +
-	"\x11GetMemberResponse\x12*\n" +
-	"\x06member\x18\x01 \x01(\v2\x12.members.v1.MemberR\x06member\"\x9a\x03\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\x9a\x03\n" +
 	"\x13UpdateMemberRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -898,9 +762,7 @@ const file_members_v1_members_proto_rawDesc = "" +
 	"\x06_emailB\b\n" +
 	"\x06_phoneB\n" +
 	"\n" +
-	"\b_address\"B\n" +
-	"\x14UpdateMemberResponse\x12*\n" +
-	"\x06member\x18\x01 \x01(\v2\x12.members.v1.MemberR\x06member\"%\n" +
+	"\b_address\"%\n" +
 	"\x13DeleteMemberRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
 	"\x14DeleteMemberResponse\x12\x18\n" +
@@ -919,12 +781,12 @@ const file_members_v1_members_proto_rawDesc = "" +
 	"\x19MEMBER_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14MEMBER_STATUS_ACTIVE\x10\x01\x12\x1a\n" +
 	"\x16MEMBER_STATUS_INACTIVE\x10\x02\x12\x19\n" +
-	"\x15MEMBER_STATUS_VISITOR\x10\x032\xa2\x03\n" +
-	"\rMemberService\x12Q\n" +
-	"\fCreateMember\x12\x1f.members.v1.CreateMemberRequest\x1a .members.v1.CreateMemberResponse\x12H\n" +
-	"\tGetMember\x12\x1c.members.v1.GetMemberRequest\x1a\x1d.members.v1.GetMemberResponse\x12N\n" +
-	"\vListMembers\x12\x1e.members.v1.ListMembersRequest\x1a\x1f.members.v1.ListMembersResponse\x12Q\n" +
-	"\fUpdateMember\x12\x1f.members.v1.UpdateMemberRequest\x1a .members.v1.UpdateMemberResponse\x12Q\n" +
+	"\x15MEMBER_STATUS_VISITOR\x10\x032\xfb\x02\n" +
+	"\rMemberService\x12C\n" +
+	"\fCreateMember\x12\x1f.members.v1.CreateMemberRequest\x1a\x12.members.v1.Member\x12=\n" +
+	"\tGetMember\x12\x1c.members.v1.GetMemberRequest\x1a\x12.members.v1.Member\x12N\n" +
+	"\vListMembers\x12\x1e.members.v1.ListMembersRequest\x1a\x1f.members.v1.ListMembersResponse\x12C\n" +
+	"\fUpdateMember\x12\x1f.members.v1.UpdateMemberRequest\x1a\x12.members.v1.Member\x12Q\n" +
 	"\fDeleteMember\x12\x1f.members.v1.DeleteMemberRequest\x1a .members.v1.DeleteMemberResponseB<Z:github.com/Jeudry/adventist-stack/gen/members/v1;membersv1b\x06proto3"
 
 var (
@@ -940,53 +802,47 @@ func file_members_v1_members_proto_rawDescGZIP() []byte {
 }
 
 var file_members_v1_members_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_members_v1_members_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_members_v1_members_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_members_v1_members_proto_goTypes = []any{
 	(MemberStatus)(0),             // 0: members.v1.MemberStatus
 	(*Member)(nil),                // 1: members.v1.Member
 	(*CreateMemberRequest)(nil),   // 2: members.v1.CreateMemberRequest
-	(*CreateMemberResponse)(nil),  // 3: members.v1.CreateMemberResponse
-	(*GetMemberRequest)(nil),      // 4: members.v1.GetMemberRequest
-	(*GetMemberResponse)(nil),     // 5: members.v1.GetMemberResponse
-	(*UpdateMemberRequest)(nil),   // 6: members.v1.UpdateMemberRequest
-	(*UpdateMemberResponse)(nil),  // 7: members.v1.UpdateMemberResponse
-	(*DeleteMemberRequest)(nil),   // 8: members.v1.DeleteMemberRequest
-	(*DeleteMemberResponse)(nil),  // 9: members.v1.DeleteMemberResponse
-	(*ListMembersRequest)(nil),    // 10: members.v1.ListMembersRequest
-	(*ListMembersResponse)(nil),   // 11: members.v1.ListMembersResponse
-	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
+	(*GetMemberRequest)(nil),      // 3: members.v1.GetMemberRequest
+	(*UpdateMemberRequest)(nil),   // 4: members.v1.UpdateMemberRequest
+	(*DeleteMemberRequest)(nil),   // 5: members.v1.DeleteMemberRequest
+	(*DeleteMemberResponse)(nil),  // 6: members.v1.DeleteMemberResponse
+	(*ListMembersRequest)(nil),    // 7: members.v1.ListMembersRequest
+	(*ListMembersResponse)(nil),   // 8: members.v1.ListMembersResponse
+	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
 }
 var file_members_v1_members_proto_depIdxs = []int32{
-	12, // 0: members.v1.Member.birth_date:type_name -> google.protobuf.Timestamp
-	12, // 1: members.v1.Member.baptism_date:type_name -> google.protobuf.Timestamp
+	9,  // 0: members.v1.Member.birth_date:type_name -> google.protobuf.Timestamp
+	9,  // 1: members.v1.Member.baptism_date:type_name -> google.protobuf.Timestamp
 	0,  // 2: members.v1.Member.status:type_name -> members.v1.MemberStatus
-	12, // 3: members.v1.Member.created_at:type_name -> google.protobuf.Timestamp
-	12, // 4: members.v1.Member.updated_at:type_name -> google.protobuf.Timestamp
-	12, // 5: members.v1.CreateMemberRequest.birth_date:type_name -> google.protobuf.Timestamp
-	12, // 6: members.v1.CreateMemberRequest.baptism_date:type_name -> google.protobuf.Timestamp
+	9,  // 3: members.v1.Member.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 4: members.v1.Member.updated_at:type_name -> google.protobuf.Timestamp
+	9,  // 5: members.v1.CreateMemberRequest.birth_date:type_name -> google.protobuf.Timestamp
+	9,  // 6: members.v1.CreateMemberRequest.baptism_date:type_name -> google.protobuf.Timestamp
 	0,  // 7: members.v1.CreateMemberRequest.status:type_name -> members.v1.MemberStatus
-	1,  // 8: members.v1.CreateMemberResponse.member:type_name -> members.v1.Member
-	1,  // 9: members.v1.GetMemberResponse.member:type_name -> members.v1.Member
-	12, // 10: members.v1.UpdateMemberRequest.birth_date:type_name -> google.protobuf.Timestamp
-	12, // 11: members.v1.UpdateMemberRequest.baptism_date:type_name -> google.protobuf.Timestamp
-	0,  // 12: members.v1.UpdateMemberRequest.status:type_name -> members.v1.MemberStatus
-	1,  // 13: members.v1.UpdateMemberResponse.member:type_name -> members.v1.Member
-	1,  // 14: members.v1.ListMembersResponse.items:type_name -> members.v1.Member
-	2,  // 15: members.v1.MemberService.CreateMember:input_type -> members.v1.CreateMemberRequest
-	4,  // 16: members.v1.MemberService.GetMember:input_type -> members.v1.GetMemberRequest
-	10, // 17: members.v1.MemberService.ListMembers:input_type -> members.v1.ListMembersRequest
-	6,  // 18: members.v1.MemberService.UpdateMember:input_type -> members.v1.UpdateMemberRequest
-	8,  // 19: members.v1.MemberService.DeleteMember:input_type -> members.v1.DeleteMemberRequest
-	3,  // 20: members.v1.MemberService.CreateMember:output_type -> members.v1.CreateMemberResponse
-	5,  // 21: members.v1.MemberService.GetMember:output_type -> members.v1.GetMemberResponse
-	11, // 22: members.v1.MemberService.ListMembers:output_type -> members.v1.ListMembersResponse
-	7,  // 23: members.v1.MemberService.UpdateMember:output_type -> members.v1.UpdateMemberResponse
-	9,  // 24: members.v1.MemberService.DeleteMember:output_type -> members.v1.DeleteMemberResponse
-	20, // [20:25] is the sub-list for method output_type
-	15, // [15:20] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	9,  // 8: members.v1.UpdateMemberRequest.birth_date:type_name -> google.protobuf.Timestamp
+	9,  // 9: members.v1.UpdateMemberRequest.baptism_date:type_name -> google.protobuf.Timestamp
+	0,  // 10: members.v1.UpdateMemberRequest.status:type_name -> members.v1.MemberStatus
+	1,  // 11: members.v1.ListMembersResponse.items:type_name -> members.v1.Member
+	2,  // 12: members.v1.MemberService.CreateMember:input_type -> members.v1.CreateMemberRequest
+	3,  // 13: members.v1.MemberService.GetMember:input_type -> members.v1.GetMemberRequest
+	7,  // 14: members.v1.MemberService.ListMembers:input_type -> members.v1.ListMembersRequest
+	4,  // 15: members.v1.MemberService.UpdateMember:input_type -> members.v1.UpdateMemberRequest
+	5,  // 16: members.v1.MemberService.DeleteMember:input_type -> members.v1.DeleteMemberRequest
+	1,  // 17: members.v1.MemberService.CreateMember:output_type -> members.v1.Member
+	1,  // 18: members.v1.MemberService.GetMember:output_type -> members.v1.Member
+	8,  // 19: members.v1.MemberService.ListMembers:output_type -> members.v1.ListMembersResponse
+	1,  // 20: members.v1.MemberService.UpdateMember:output_type -> members.v1.Member
+	6,  // 21: members.v1.MemberService.DeleteMember:output_type -> members.v1.DeleteMemberResponse
+	17, // [17:22] is the sub-list for method output_type
+	12, // [12:17] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_members_v1_members_proto_init() }
@@ -996,15 +852,15 @@ func file_members_v1_members_proto_init() {
 	}
 	file_members_v1_members_proto_msgTypes[0].OneofWrappers = []any{}
 	file_members_v1_members_proto_msgTypes[1].OneofWrappers = []any{}
-	file_members_v1_members_proto_msgTypes[5].OneofWrappers = []any{}
-	file_members_v1_members_proto_msgTypes[9].OneofWrappers = []any{}
+	file_members_v1_members_proto_msgTypes[3].OneofWrappers = []any{}
+	file_members_v1_members_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_members_v1_members_proto_rawDesc), len(file_members_v1_members_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   11,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

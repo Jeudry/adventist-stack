@@ -51,16 +51,8 @@ message CreateMemberRequest {
   MemberStatus status = 9;
 }
 
-message CreateMemberResponse {
-  Member member = 1;
-}
-
 message GetMemberRequest {
     string id = 1;
-}
-
-message GetMemberResponse {
-  Member member = 1;
 }
 
 message UpdateMemberRequest {
@@ -74,10 +66,6 @@ message UpdateMemberRequest {
     optional string address = 8;
     google.protobuf.Timestamp baptism_date = 9;
     MemberStatus status = 10;
-}
-
-message UpdateMemberResponse {
-  Member member = 1;
 }
 
 message DeleteMemberRequest {
@@ -102,9 +90,9 @@ message ListMembersResponse {
 }
 
 service MemberService {
-    rpc CreateMember(CreateMemberRequest) returns (CreateMemberResponse);
-    rpc GetMember(GetMemberRequest) returns (GetMemberResponse);
+    rpc CreateMember(CreateMemberRequest) returns (Member);
+    rpc GetMember(GetMemberRequest) returns (Member);
     rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
-    rpc UpdateMember(UpdateMemberRequest) returns (UpdateMemberResponse);
+    rpc UpdateMember(UpdateMemberRequest) returns (Member);
     rpc DeleteMember(DeleteMemberRequest) returns (DeleteMemberResponse);
 }

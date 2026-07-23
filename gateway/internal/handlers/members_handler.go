@@ -52,7 +52,7 @@ func (h *MembersHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, toMemberVM(res.GetMember()))
+	writeJSON(w, http.StatusCreated, toMemberVM(res))
 }
 
 func (h *MembersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +63,7 @@ func (h *MembersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toMemberVM(res.GetMember()))
+	writeJSON(w, http.StatusOK, toMemberVM(res))
 }
 
 func (h *MembersHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +130,7 @@ func (h *MembersHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toMemberVM(res.GetMember()))
+	writeJSON(w, http.StatusOK, toMemberVM(res))
 }
 
 func (h *MembersHandler) Delete(w http.ResponseWriter, r *http.Request) {

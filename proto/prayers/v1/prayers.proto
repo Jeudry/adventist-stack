@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package prayers.v1;
+
+option go_package = "github.com/Jeudry/adventist-stack/gen/prayers/v1;prayersv1";
+
+import "google/protobuf/timestamp.proto";
+
+enum PrayerStatus {
+  PRAYER_STATUS_UNSPECIFIED = 0;
+  PRAYER_STATUS_PENDING = 1;
+  PRAYER_STATUS_ANSWERED = 2;
+  PRAYER_STATUS_ARCHIVED = 3;
+}
+
+message Prayer {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  optional string author_name = 4;
+  bool is_anonymous = 5;
+  PrayerStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message CreatePrayerRequest {
+  string title = 1;
+  string description = 2;
+  optional string author_name = 3;
+  bool is_anonymous = 4;
+  PrayerStatus status = 5;
+}
+
+message GetPrayerRequest {
+  string id = 1;
+}
+
+message UpdatePrayerRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  optional string author_name = 4;
+  bool is_anonymous = 5;
+  PrayerStatus status = 6;
+}
+
+message DeletePrayerRequest {
+  string id = 1;
+}
+
+message DeletePrayerResponse {
+  bool deleted = 1;
+}
+
+message ListPrayersRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  optional string search = 3;
+}
+
+message ListPrayersResponse {
+  repeated Prayer items = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+service PrayerService {
+  rpc CreatePrayer(CreatePrayerRequest) returns (Prayer);
+  rpc GetPrayer(GetPrayerRequest) returns (Prayer);
+  rpc ListPrayers(ListPrayersRequest) returns (ListPrayersResponse);
+  rpc UpdatePrayer(UpdatePrayerRequest) returns (Prayer);
+  rpc DeletePrayer(DeletePrayerRequest) returns (DeletePrayerResponse);
+}
