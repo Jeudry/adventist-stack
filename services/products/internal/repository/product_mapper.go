@@ -23,7 +23,29 @@ func toDomain(p db.Product) domain.Product {
 		Description: p.Description,
 		Brand:       p.Brand,
 		ReleaseDate: p.ReleaseDate,
-		Status:      domain.Status(p.Status),
+		Status:      statusFromDB(p.Status),
+	}
+}
+
+func statusFromDB(s int16) domain.Status {
+	switch s {
+	case 2:
+		return domain.StatusInactive
+	case 3:
+		return domain.StatusDiscontinued
+	default:
+		return domain.StatusActive
+	}
+}
+
+func statusToDB(s domain.Status) int16 {
+	switch s {
+	case domain.StatusInactive:
+		return 2
+	case domain.StatusDiscontinued:
+		return 3
+	default:
+		return 1
 	}
 }
 
@@ -34,7 +56,7 @@ func toCreateParams(p domain.Product) db.CreateProductParams {
 		Description: p.Description,
 		Brand:       p.Brand,
 		ReleaseDate: p.ReleaseDate,
-		Status:      int16(p.Status),
+		Status:      statusToDB(p.Status),
 	}
 }
 
@@ -46,7 +68,7 @@ func toUpdateParams(p domain.Product) db.UpdateProductParams {
 		Description: p.Description,
 		Brand:       p.Brand,
 		ReleaseDate: p.ReleaseDate,
-		Status:      int16(p.Status),
+		Status:      statusToDB(p.Status),
 	}
 }
 
