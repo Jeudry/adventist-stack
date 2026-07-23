@@ -1,38 +1,64 @@
 package clients
 
 import (
-	"fmt"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	authv1 "github.com/Jeudry/adventist-stack/gen/auth/v1"
+	membersv1 "github.com/Jeudry/adventist-stack/gen/members/v1"
 	notificationsv1 "github.com/Jeudry/adventist-stack/gen/notifications/v1"
+	productsv1 "github.com/Jeudry/adventist-stack/gen/products/v1"
 )
+
+type Config struct {
+	AuthAddr          string
+	NotificationsAddr string
+	ProductsAddr      string
+	MembersAddr       string
+}
 
 type Clients struct {
 	Auth          authv1.AuthServiceClient
 	Notifications notificationsv1.NotificationServiceClient
+	Products      productsv1.ProductServiceClient
+	Members       membersv1.MemberServiceClient
 
 	conns []*grpc.ClientConn
 }
 
-func New(authAddr, notificationsAddr string) (*Clients, error) {
-	authConn, err := dial(authAddr)
+func New(cfg Config) (*Clients, error) {
+	authClient, authConn, err := newAuthClient(cfg.AuthAddr)
 	if err != nil {
-		return nil, fmt.Errorf("clients: auth: %w", err)
+		return nil, err
 	}
 
-	notifConn, err := dial(notificationsAddr)
+	notifClient, notifConn, err := newNotificationsClient(cfg.NotificationsAddr)
 	if err != nil {
 		authConn.Close()
-		return nil, fmt.Errorf("clients: notifications: %w", err)
+		return nil, err
+	}
+
+	prodClient, prodConn, err := newProductsClient(cfg.ProductsAddr)
+	if err != nil {
+		authConn.Close()
+		notifConn.Close()
+		return nil, err
+	}
+
+	memClient, memConn, err := newMembersClient(cfg.MembersAddr)
+	if err != nil {
+		authConn.Close()
+		notifConn.Close()
+		prodConn.Close()
+		return nil, err
 	}
 
 	return &Clients{
-		Auth:          authv1.NewAuthServiceClient(authConn),
-		Notifications: notificationsv1.NewNotificationServiceClient(notifConn),
-		conns:         []*grpc.ClientConn{authConn, notifConn},
+		Auth:          authClient,
+		Notifications: notifClient,
+		Products:      prodClient,
+		Members:       memClient,
+		conns:         []*grpc.ClientConn{authConn, notifConn, prodConn, memConn},
 	}, nil
 }
 
