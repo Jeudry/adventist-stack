@@ -10,15 +10,15 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 
 **Roadmap de la feature:**
 - ✅ **Paso 4 — dominio + repo + service de members**: hecho, compila, `go vet` limpio. Usa `entity.Base`, VOs `Email`/`Phone`, enums `Status`/`Gender`, validación con `errors.Join`.
-- 🚧 **Paso 5 — capa gRPC + Gateway (EN CURSO)**:
+- ✅ **Paso 5 — capa gRPC + Gateway (COMPLETADO)**:
   - ✅ **5.1** `services/members/internal/grpc/server.go` + `mapper.go` (completado).
   - ✅ **5.2** `services/members/cmd/server/main.go` (wiring completado).
-  - 🚧 **5.3** Gateway:
-    - ✅ **5.3.1** Cliente gRPC en `gateway/internal/clients/` (refactorizado en archivos independientes: `members_client.go`, `auth_client.go`, etc.).
-    - 🚧 **5.3.2** Handler HTTP `members_handler.go` ← **acá estamos ahora**.
-    - 🔴 **5.3.3** Registro de rutas en `gateway/internal/router/router.go`.
+  - ✅ **5.3** Gateway:
+    - ✅ **5.3.1** Cliente gRPC en `gateway/internal/clients/members_client.go`.
+    - ✅ **5.3.2** Handlers HTTP divididos al estilo C# (`members_handler.go`, `members_dto.go`, `members_mapper.go`).
+    - ✅ **5.3.3** Registro de rutas en `gateway/internal/router/router.go` bajo `/api/v1/members`.
 
-**Micro-tarea actual:** escribir los handlers HTTP de members en `gateway/internal/handlers/members_handler.go`.
+**Estado actual:** Feature #1 (Members Management) **100% completada y lista para Pull Request a `main`**.
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
