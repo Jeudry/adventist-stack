@@ -16,8 +16,8 @@ type Member struct {
 	LastName    string
 	Email       *string
 	Phone       *string
-	Gender      string
-	Status      string
+	Gender      int16
+	Status      int16
 	BirthDate   *time.Time
 	BaptismDate *time.Time
 	CreatedAt   time.Time

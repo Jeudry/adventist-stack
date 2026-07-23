@@ -39,11 +39,11 @@ type CreateMemberParams struct {
 	LastName    string
 	Email       *string
 	Phone       *string
-	Gender      string
+	Gender      int16
 	Address     *string
 	BirthDate   *time.Time
 	BaptismDate *time.Time
-	Status      string
+	Status      int16
 }
 
 func (q *Queries) CreateMember(ctx context.Context, arg CreateMemberParams) (Member, error) {
@@ -195,11 +195,11 @@ type UpdateMemberParams struct {
 	LastName    string
 	Email       *string
 	Phone       *string
-	Gender      string
+	Gender      int16
 	Address     *string
 	BirthDate   *time.Time
 	BaptismDate *time.Time
-	Status      string
+	Status      int16
 }
 
 func (q *Queries) UpdateMember(ctx context.Context, arg UpdateMemberParams) (Member, error) {

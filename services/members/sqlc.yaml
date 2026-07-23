@@ -5,6 +5,7 @@ sql:
       - "migrations/000001_create_members_table.up.sql"
       - "migrations/000002_add_address_to_members.up.sql"
       - "migrations/000003_add_audit_columns_to_members.up.sql"
+      - "migrations/000004_status_gender_to_smallint.up.sql"
     queries: "query.sql"
     gen:
       go:

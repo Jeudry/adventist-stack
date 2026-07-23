@@ -47,11 +47,11 @@ func toCreateParams(m domain.Member) db.CreateMemberParams {
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
 		Phone:       m.Phone.Ptr(),
-		Gender:      string(m.Gender),
+		Gender:      int16(m.Gender),
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
-		Status:      string(m.Status),
+		Status:      int16(m.Status),
 	}
 }
 
@@ -62,11 +62,11 @@ func toUpdateParams(m domain.Member) db.UpdateMemberParams {
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
 		Phone:       m.Phone.Ptr(),
-		Gender:      string(m.Gender),
+		Gender:      int16(m.Gender),
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
-		Status:      string(m.Status),
+		Status:      int16(m.Status),
 	}
 }
 

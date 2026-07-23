@@ -20,13 +20,26 @@ const (
 	MaxBaptismAge   = 130
 )
 
-type Status string
+type Status int
 
 const (
-	StatusActive   Status = "active"
-	StatusInactive Status = "inactive"
-	StatusVisitor  Status = "visitor"
+	StatusActive Status = iota + 1
+	StatusInactive
+	StatusVisitor
 )
+
+func (s Status) String() string {
+	switch s {
+	case StatusActive:
+		return "active"
+	case StatusInactive:
+		return "inactive"
+	case StatusVisitor:
+		return "visitor"
+	default:
+		return "unknown"
+	}
+}
 
 func (s Status) IsValid() bool {
 	switch s {
@@ -37,12 +50,36 @@ func (s Status) IsValid() bool {
 	}
 }
 
-type Gender string
+type Gender int
 
 const (
-	GenderMale   Gender = "M"
-	GenderFemale Gender = "F"
+	GenderMale Gender = iota + 1
+	GenderFemale
 )
+
+func (g Gender) String() string {
+	switch g {
+	case GenderMale:
+		return "M"
+	case GenderFemale:
+		return "F"
+	default:
+		return ""
+	}
+}
+
+// ParseGender maps external text (e.g. "m", " F ") to a Gender, or the zero
+// value when it does not match a known gender.
+func ParseGender(s string) Gender {
+	switch strings.ToUpper(strings.TrimSpace(s)) {
+	case "M":
+		return GenderMale
+	case "F":
+		return GenderFemale
+	default:
+		return Gender(0)
+	}
+}
 
 func (g Gender) IsValid() bool {
 	switch g {
@@ -74,10 +111,9 @@ type Member struct {
 func (m Member) Normalize() Member {
 	m.FirstName = strings.TrimSpace(m.FirstName)
 	m.LastName = strings.TrimSpace(m.LastName)
-	m.Gender = Gender(strings.ToUpper(strings.TrimSpace(string(m.Gender))))
 	m.Address = strutil.TrimPtr(m.Address)
 
-	if m.Status == "" {
+	if m.Status == 0 {
 		m.Status = StatusActive
 	}
 
