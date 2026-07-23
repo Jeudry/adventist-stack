@@ -10,12 +10,15 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 
 **Roadmap de la feature:**
 - ✅ **Paso 4 — dominio + repo + service de members**: hecho, compila, `go vet` limpio. Usa `entity.Base`, VOs `Email`/`Phone`, enums `Status`/`Gender`, validación con `errors.Join`.
-- 🚧 **Paso 5 — capa gRPC (EN CURSO)**:
+- 🚧 **Paso 5 — capa gRPC + Gateway (EN CURSO)**:
   - ✅ **5.1** `services/members/internal/grpc/server.go` + `mapper.go` (completado).
   - ✅ **5.2** `services/members/cmd/server/main.go` (wiring completado).
-  - 🚧 **5.3** Gateway: client + `members_handler.go` + rutas ← **acá estamos ahora**.
+  - 🚧 **5.3** Gateway:
+    - ✅ **5.3.1** Cliente gRPC en `gateway/internal/clients/` (refactorizado en archivos independientes: `members_client.go`, `auth_client.go`, etc.).
+    - 🚧 **5.3.2** Handler HTTP `members_handler.go` ← **acá estamos ahora**.
+    - 🔴 **5.3.3** Registro de rutas en `gateway/internal/router/router.go`.
 
-**Micro-tarea actual:** pasar al cliente gRPC del Gateway y los handlers HTTP (`gateway/internal/...`).
+**Micro-tarea actual:** escribir los handlers HTTP de members en `gateway/internal/handlers/members_handler.go`.
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
@@ -24,7 +27,8 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 4. **Siempre sugiere el siguiente paso en español** al terminar.
 
 **Decisiones ya tomadas en esta feature** (no re-litigar):
-- VOs solo para `email`/`phone` (validación real). Enums `Status`/`Gender` = typed string + `IsValid()`, NO struct-VO.
+- Enums `Status`/`Gender` en el dominio usan `type Status int` / `type Gender int` con `iota + 1` y métodos `String()` / `IsValid()`.
+- Clientes gRPC en el Gateway divididos por archivo en `gateway/internal/clients/` (`auth_client.go`, `members_client.go`, `products_client.go`, `notifications_client.go`).
 - `entity.Base` embebido en las 3 entidades (Member, User, Product) con campos de auditoría. Soft-delete/actor: columnas creadas pero lógica **no** activada aún.
 - Helpers genéricos extraídos a `pkg/protoconv` (timestamps) y `pkg/ptr` (`Deref`). Los específicos (statusFromProto, toStatus) quedan locales.
 - Pendiente futuro (no ahora): `ParseStatus` de string para el gateway (JSON), soft-delete real, wiring de actor desde JWT.
