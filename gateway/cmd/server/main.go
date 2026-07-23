@@ -23,7 +23,6 @@ type Config struct {
 	HTTPPort          string        `env:"GATEWAY_HTTP_PORT" envDefault:"8080"`
 	AuthAddr          string        `env:"AUTH_GRPC_ADDR" envDefault:"localhost:50051"`
 	NotificationsAddr string        `env:"NOTIFICATIONS_GRPC_ADDR" envDefault:"localhost:50054"`
-	ProductsAddr      string        `env:"PRODUCTS_GRPC_ADDR" envDefault:"localhost:50053"`
 	MembersAddr       string        `env:"MEMBERS_GRPC_ADDR" envDefault:"localhost:50052"`
 	AllowedOrigins    string        `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
 	RateLimit         int           `env:"RATE_LIMIT_REQUESTS" envDefault:"100"`
@@ -44,7 +43,6 @@ func main() {
 	grpcClients, err := clients.New(clients.Config{
 		AuthAddr:          cfg.AuthAddr,
 		NotificationsAddr: cfg.NotificationsAddr,
-		ProductsAddr:      cfg.ProductsAddr,
 		MembersAddr:       cfg.MembersAddr,
 	})
 	if err != nil {

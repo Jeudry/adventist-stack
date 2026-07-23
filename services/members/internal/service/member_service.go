@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Jeudry/adventist-stack/pkg/pagination"
 	"github.com/Jeudry/adventist-stack/services/members/internal/domain"
@@ -25,17 +26,17 @@ func NewMemberService(repo memberRepository) *MemberService {
 	return &MemberService{repo: repo}
 }
 
-func (s MemberService) Create(ctx context.Context, domain domain.Member) {
-	d := normalize(req)
-	if err != validate(p); err != nil {
-		return domain.Member{}
+func (s MemberService) Create(ctx context.Context, member domain.Member) (domain.Member, error) {
+	m := member.Normalize()
+	if err := m.Validate(); err != nil {
+		return domain.Member{}, err
 	}
 
-	return s.repo.Create()
+	return s.repo.Create(ctx, m)
 }
 
 func (s MemberService) GetByID(ctx context.Context, member domain.Member) (domain.Member, error) {
-	return s.repo.GetByID(ctx, member.Id)
+	return s.repo.GetByID(ctx, member.ID)
 }
 
 func (s MemberService) RetrieveList(ctx context.Context, req pagination.ListRequest) (pagination.Page[domain.Member], error) {
@@ -51,4 +52,21 @@ func (s MemberService) RetrieveList(ctx context.Context, req pagination.ListRequ
 	}
 
 	return pagination.NewPage(items, total, q), nil
+}
+
+func (s MemberService) Update(ctx context.Context, member domain.Member) (domain.Member, error) {
+	if member.ID == uuid.Nil {
+		return domain.Member{}, fmt.Errorf("%w: domain update id is required", domain.ErrorInvalidMember)
+	}
+
+	m := member.Normalize()
+	if err := m.Validate(); err != nil {
+		return domain.Member{}, err
+	}
+
+	return s.repo.Update(ctx, m)
+}
+
+func (s MemberService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.repo.Delete(ctx, id)
 }

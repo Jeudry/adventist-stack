@@ -106,8 +106,7 @@ services/<svc>/
 ## Estado por servicio
 
 - **auth** ✅ — end-to-end (domain con `Email` VO + comportamiento, sqlc, gRPC, gateway). Tests verdes.
-- **products** 📐 — servicio de **REFERENCIA/molde** (no se despliega). Patrón completo incl. gRPC server + main. Copiar de acá.
-- **members** 🚧 — domain/repo/service listos; capa gRPC en curso (ver handoff arriba).
+- **members** ✅ — end-to-end (domain, sqlc, gRPC server/wiring, gateway client/handlers/routes). 100% completado.
 - **notifications** — Redis pub/sub + mailer.
 
 ## Comandos

@@ -7,20 +7,17 @@ import (
 	authv1 "github.com/Jeudry/adventist-stack/gen/auth/v1"
 	membersv1 "github.com/Jeudry/adventist-stack/gen/members/v1"
 	notificationsv1 "github.com/Jeudry/adventist-stack/gen/notifications/v1"
-	productsv1 "github.com/Jeudry/adventist-stack/gen/products/v1"
 )
 
 type Config struct {
 	AuthAddr          string
 	NotificationsAddr string
-	ProductsAddr      string
 	MembersAddr       string
 }
 
 type Clients struct {
 	Auth          authv1.AuthServiceClient
 	Notifications notificationsv1.NotificationServiceClient
-	Products      productsv1.ProductServiceClient
 	Members       membersv1.MemberServiceClient
 
 	conns []*grpc.ClientConn
@@ -38,27 +35,18 @@ func New(cfg Config) (*Clients, error) {
 		return nil, err
 	}
 
-	prodClient, prodConn, err := newProductsClient(cfg.ProductsAddr)
-	if err != nil {
-		authConn.Close()
-		notifConn.Close()
-		return nil, err
-	}
-
 	memClient, memConn, err := newMembersClient(cfg.MembersAddr)
 	if err != nil {
 		authConn.Close()
 		notifConn.Close()
-		prodConn.Close()
 		return nil, err
 	}
 
 	return &Clients{
 		Auth:          authClient,
 		Notifications: notifClient,
-		Products:      prodClient,
 		Members:       memClient,
-		conns:         []*grpc.ClientConn{authConn, notifConn, prodConn, memConn},
+		conns:         []*grpc.ClientConn{authConn, notifConn, memConn},
 	}, nil
 }
 
