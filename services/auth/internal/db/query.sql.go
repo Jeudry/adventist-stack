@@ -19,7 +19,7 @@ type CreateUserParams struct {
 	Email        string
 	Name         string
 	PasswordHash string
-	Role         string
+	Role         int16
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {

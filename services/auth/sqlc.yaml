@@ -4,6 +4,7 @@ sql:
     schema:
       - "migrations/0001_init.up.sql"
       - "migrations/0002_add_audit_columns.up.sql"
+      - "migrations/0003_role_to_smallint.up.sql"
     queries: "query.sql"
     gen:
       go:

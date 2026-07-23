@@ -62,7 +62,7 @@ func buildSession(u domain.User, access, refresh string) *authv1.Session {
 			Id:    u.ID.String(),
 			Email: u.Email.String(),
 			Name:  u.Name,
-			Role:  string(u.Role),
+			Role:  u.Role.String(),
 		},
 		AccessToken:  access,
 		RefreshToken: refresh,

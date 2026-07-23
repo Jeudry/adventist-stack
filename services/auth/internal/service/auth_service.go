@@ -82,7 +82,7 @@ func (s *AuthService) ValidateToken(accessToken string) (userID, role string, er
 }
 
 func (s *AuthService) issue(u domain.User) (Tokens, error) {
-	access, refresh, err := s.jwt.Generate(u.ID.String(), string(u.Role))
+	access, refresh, err := s.jwt.Generate(u.ID.String(), u.Role.String())
 	if err != nil {
 		return Tokens{}, err
 	}

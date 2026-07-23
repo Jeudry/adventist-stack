@@ -23,12 +23,23 @@ const (
 	PasswordMinLen = 8
 )
 
-type Role string
+type Role int
 
 const (
-	RoleAdmin  Role = "admin"
-	RoleMember Role = "member"
+	RoleAdmin Role = iota + 1
+	RoleMember
 )
+
+func (r Role) String() string {
+	switch r {
+	case RoleAdmin:
+		return "admin"
+	case RoleMember:
+		return "member"
+	default:
+		return "unknown"
+	}
+}
 
 func (r Role) IsValid() bool {
 	switch r {

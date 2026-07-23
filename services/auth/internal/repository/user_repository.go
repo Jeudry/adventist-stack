@@ -26,7 +26,7 @@ func (r *UserRepository) Create(ctx context.Context, u domain.User) (domain.User
 		Email:        u.Email.String(),
 		Name:         u.Name,
 		PasswordHash: u.PasswordHash,
-		Role:         string(u.Role),
+		Role:         int16(u.Role),
 	})
 	if err != nil {
 		return domain.User{}, fmt.Errorf("repository: create user: %w", err)

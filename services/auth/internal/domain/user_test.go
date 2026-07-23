@@ -29,7 +29,7 @@ func TestNewUser_Invalid(t *testing.T) {
 	}{
 		"bad email":    {email: "nope", name: "John", role: domain.RoleMember, wantErr: vo.ErrInvalidEmail},
 		"empty name":   {email: "a@b.co", name: "  ", role: domain.RoleMember, wantErr: domain.ErrInvalidUser},
-		"invalid role": {email: "a@b.co", name: "John", role: domain.Role("ghost"), wantErr: domain.ErrInvalidUser},
+		"invalid role": {email: "a@b.co", name: "John", role: domain.Role(99), wantErr: domain.ErrInvalidUser},
 	}
 
 	for name, tc := range cases {
