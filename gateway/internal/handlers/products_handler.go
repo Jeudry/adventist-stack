@@ -33,21 +33,12 @@ type UpdateProductRequest struct {
 }
 
 type ProductVM struct {
-	ID          string  `json:"id"`
+	BaseVM
 	Name        string  `json:"name"`
 	Sku         string  `json:"sku"`
 	Description *string `json:"description,omitempty"`
 	Brand       *string `json:"brand,omitempty"`
 	Status      string  `json:"status"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
-}
-
-type ProductListResponse struct {
-	Items    []ProductVM `json:"items"`
-	Total    int32       `json:"total"`
-	Page     int32       `json:"page"`
-	PageSize int32       `json:"page_size"`
 }
 
 func (h *ProductsHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +93,7 @@ func (h *ProductsHandler) List(w http.ResponseWriter, r *http.Request) {
 		items[i] = toProductVM(p)
 	}
 
-	writeJSON(w, http.StatusOK, ProductListResponse{
+	writeJSON(w, http.StatusOK, PageResponse[ProductVM]{
 		Items:    items,
 		Total:    res.GetTotal(),
 		Page:     res.GetPage(),
@@ -148,22 +139,13 @@ func toProductVM(p *productsv1.Product) ProductVM {
 	if p == nil {
 		return ProductVM{}
 	}
-	var createdAt, updatedAt string
-	if p.GetCreatedAt() != nil {
-		createdAt = p.GetCreatedAt().AsTime().Format("2006-01-02T15:04:05Z07:00")
-	}
-	if p.GetUpdatedAt() != nil {
-		updatedAt = p.GetUpdatedAt().AsTime().Format("2006-01-02T15:04:05Z07:00")
-	}
 
 	return ProductVM{
-		ID:          p.GetId(),
+		BaseVM:      toBaseVM(p.GetId(), p.GetCreatedAt(), p.GetUpdatedAt()),
 		Name:        p.GetName(),
 		Sku:         p.GetSku(),
 		Description: p.Description,
 		Brand:       p.Brand,
 		Status:      p.GetStatus().String(),
-		CreatedAt:   createdAt,
-		UpdatedAt:   updatedAt,
 	}
 }
