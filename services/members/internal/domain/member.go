@@ -20,55 +20,74 @@ const (
 	MaxBaptismAge   = 130
 )
 
-type Status string
+type Status int
 
 const (
-	StatusActive   Status = "active"
-	StatusInactive Status = "inactive"
-	StatusVisitor  Status = "visitor"
+	StatusActive Status = iota + 1
+	StatusInactive
+	StatusVisitor
 )
+
+func (s Status) String() string {
+	switch s {
+	case StatusActive:
+		return "active"
+	case StatusInactive:
+		return "inactive"
+	case StatusVisitor:
+		return "visitor"
+	default:
+		return "unknown"
+	}
+}
 
 func (s Status) IsValid() bool {
 	switch s {
 	case StatusActive, StatusInactive, StatusVisitor:
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
-func (s Status) String() string {
-	if !s.IsValid() {
-		return "unknown"
-	}
-	return string(s)
-}
-
-type Gender string
+type Gender int
 
 const (
-	GenderMale   Gender = "M"
-	GenderFemale Gender = "F"
+	GenderMale Gender = iota + 1
+	GenderFemale
 )
 
-func (g Gender) IsValid() bool {
-	return g == GenderMale || g == GenderFemale
-}
-
 func (g Gender) String() string {
-	if !g.IsValid() {
+	switch g {
+	case GenderMale:
+		return "M"
+	case GenderFemale:
+		return "F"
+	default:
 		return ""
 	}
-	return string(g)
 }
 
-// ParseGender maps external text (e.g. "m", " F ") to a Gender, or empty
-// when it does not match a known gender.
+// ParseGender maps external text (e.g. "m", " F ") to a Gender, or the zero
+// value when it does not match a known gender.
 func ParseGender(s string) Gender {
-	g := Gender(strings.ToUpper(strings.TrimSpace(s)))
-	if !g.IsValid() {
-		return ""
+	switch strings.ToUpper(strings.TrimSpace(s)) {
+	case "M":
+		return GenderMale
+	case "F":
+		return GenderFemale
+	default:
+		return Gender(0)
 	}
-	return g
+}
+
+func (g Gender) IsValid() bool {
+	switch g {
+	case GenderMale, GenderFemale:
+		return true
+	default:
+		return false
+	}
 }
 
 var (
@@ -94,7 +113,7 @@ func (m Member) Normalize() Member {
 	m.LastName = strings.TrimSpace(m.LastName)
 	m.Address = strutil.TrimPtr(m.Address)
 
-	if m.Status == "" {
+	if m.Status == 0 {
 		m.Status = StatusActive
 	}
 

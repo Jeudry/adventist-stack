@@ -33,30 +33,12 @@ func toDomain(m db.Member) (domain.Member, error) {
 		LastName:    m.LastName,
 		Email:       email,
 		Phone:       phone,
-		Gender:      genderFromDB(m.Gender),
+		Gender:      domain.Gender(m.Gender),
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
-		Status:      statusFromDB(m.Status),
+		Status:      domain.Status(m.Status),
 	}, nil
-}
-
-func statusFromDB(s int16) domain.Status {
-	switch s {
-	case 2:
-		return domain.StatusInactive
-	case 3:
-		return domain.StatusVisitor
-	default:
-		return domain.StatusActive
-	}
-}
-
-func genderFromDB(g int16) domain.Gender {
-	if g == 2 {
-		return domain.GenderFemale
-	}
-	return domain.GenderMale
 }
 
 func toCreateParams(m domain.Member) db.CreateMemberParams {
@@ -65,11 +47,11 @@ func toCreateParams(m domain.Member) db.CreateMemberParams {
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
 		Phone:       m.Phone.Ptr(),
-		Gender:      genderToDB(m.Gender),
+		Gender:      int16(m.Gender),
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
-		Status:      statusToDB(m.Status),
+		Status:      int16(m.Status),
 	}
 }
 
@@ -80,30 +62,12 @@ func toUpdateParams(m domain.Member) db.UpdateMemberParams {
 		LastName:    m.LastName,
 		Email:       m.Email.Ptr(),
 		Phone:       m.Phone.Ptr(),
-		Gender:      genderToDB(m.Gender),
+		Gender:      int16(m.Gender),
 		Address:     m.Address,
 		BirthDate:   m.BirthDate,
 		BaptismDate: m.BaptismDate,
-		Status:      statusToDB(m.Status),
+		Status:      int16(m.Status),
 	}
-}
-
-func statusToDB(s domain.Status) int16 {
-	switch s {
-	case domain.StatusInactive:
-		return 2
-	case domain.StatusVisitor:
-		return 3
-	default:
-		return 1
-	}
-}
-
-func genderToDB(g domain.Gender) int16 {
-	if g == domain.GenderFemale {
-		return 2
-	}
-	return 1
 }
 
 func toMemberListParams(q pagination.Query) db.ListMembersParams {

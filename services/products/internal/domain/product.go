@@ -9,27 +9,34 @@ import (
 	"github.com/Jeudry/adventist-stack/pkg/entity"
 )
 
-type Status string
+type Status int
 
 const (
-	StatusActive       Status = "active"
-	StatusInactive     Status = "inactive"
-	StatusDiscontinued Status = "discontinued"
+	StatusActive Status = iota + 1
+	StatusInactive
+	StatusDiscontinued
 )
+
+func (s Status) String() string {
+	switch s {
+	case StatusActive:
+		return "active"
+	case StatusInactive:
+		return "inactive"
+	case StatusDiscontinued:
+		return "discontinued"
+	default:
+		return "unknown"
+	}
+}
 
 func (s Status) IsValid() bool {
 	switch s {
 	case StatusActive, StatusInactive, StatusDiscontinued:
 		return true
+	default:
+		return false
 	}
-	return false
-}
-
-func (s Status) String() string {
-	if !s.IsValid() {
-		return "unknown"
-	}
-	return string(s)
 }
 
 var (
@@ -55,7 +62,7 @@ type Product struct {
 func (p Product) Normalize() Product {
 	p.Name = strings.TrimSpace(p.Name)
 	p.Sku = strings.TrimSpace(p.Sku)
-	if p.Status == "" {
+	if p.Status == 0 {
 		p.Status = StatusActive
 	}
 	return p
