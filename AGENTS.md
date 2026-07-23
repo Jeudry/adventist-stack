@@ -10,16 +10,12 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 
 **Roadmap de la feature:**
 - ✅ **Paso 4 — dominio + repo + service de members**: hecho, compila, `go vet` limpio. Usa `entity.Base`, VOs `Email`/`Phone`, enums `Status`/`Gender`, validación con `errors.Join`.
-- 🚧 **Paso 5 — capa gRPC (EN CURSO, lo escribe el usuario)**:
-  - **5.1** `services/members/internal/grpc/server.go` (RPCs finos) + `mapper.go` (proto ↔ domain) ← **acá estamos ahora**.
-  - **5.2** `services/members/cmd/server/main.go` (wiring). Pendiente.
-  - **5.3** Gateway: client + `members_handler.go` + rutas. Pendiente.
+- 🚧 **Paso 5 — capa gRPC (EN CURSO)**:
+  - ✅ **5.1** `services/members/internal/grpc/server.go` + `mapper.go` (completado).
+  - ✅ **5.2** `services/members/cmd/server/main.go` (wiring completado).
+  - 🚧 **5.3** Gateway: client + `members_handler.go` + rutas ← **acá estamos ahora**.
 
-**Micro-tarea actual:** el usuario está escribiendo `members/internal/grpc/mapper.go`. Va por:
-- `memberFromCreate` / `memberFromUpdate`: proto → domain. **Devuelven `error`** porque construyen los VOs (`vo.NewOptionalEmail(req.Email)`, `vo.NewOptionalPhone(req.Phone)`). Fechas con `protoconv.TimeFromProto`, status con `statusFromProto`.
-- Falta terminar `memberToProto` (inverso: `m.Email.Ptr()`, `protoconv.TimeToProto`, `statusToProto`), y definir los helpers locales `statusFromProto`/`statusToProto`/`toStatus`.
-- Molde a copiar: `services/products/internal/grpc/{server.go,mapper.go}`.
-- Verificar con `go build ./services/members/...`.
+**Micro-tarea actual:** pasar al cliente gRPC del Gateway y los handlers HTTP (`gateway/internal/...`).
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
