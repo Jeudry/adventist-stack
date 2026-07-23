@@ -6,19 +6,20 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 
 ## 🔴 En qué estamos AHORA (handoff — leer primero)
 
-**Feature activa:** miembros (`services/members`), rama `feature/1-Members_Management`, Ticket #1.
+**Feature activa:** peticiones de oración (`services/prayers`), rama `feature/2-Prayers_Management`, Ticket #2.
 
 **Roadmap de la feature:**
-- ✅ **Paso 4 — dominio + repo + service de members**: hecho, compila, `go vet` limpio. Usa `entity.Base`, VOs `Email`/`Phone`, enums `Status`/`Gender`, validación con `errors.Join`.
-- ✅ **Paso 5 — capa gRPC + Gateway (COMPLETADO)**:
-  - ✅ **5.1** `services/members/internal/grpc/server.go` + `mapper.go` (completado).
-  - ✅ **5.2** `services/members/cmd/server/main.go` (wiring completado).
-  - ✅ **5.3** Gateway:
-    - ✅ **5.3.1** Cliente gRPC en `gateway/internal/clients/members_client.go`.
-    - ✅ **5.3.2** Handlers HTTP divididos al estilo C# (`members_handler.go`, `members_dto.go`, `members_mapper.go`).
-    - ✅ **5.3.3** Registro de rutas en `gateway/internal/router/router.go` bajo `/api/v1/members`.
+- 🚧 **Paso 1 — Contrato Protobuf (`.proto`)**: `proto/prayers/v1/prayers.proto` y `make proto` ← **acá estamos ahora**.
+- 🔴 **Paso 2 — Migración + DB (`sqlc`)**: `services/prayers/migrations` y `query.sql`.
+- 🔴 **Paso 3 — Dominio (`services/prayers/internal/domain`)**: entidad `Prayer` y enum `Status`.
+- 🔴 **Paso 4 — Repositorio (`services/prayers/internal/repository`)**: repo + mappers.
+- 🔴 **Paso 5 — Servicio (`services/prayers/internal/service`)**: lógica de negocio.
+- 🔴 **Paso 6 — Capa gRPC + Wiring (`services/prayers/internal/grpc` y `cmd/server/main.go`)**.
+- 🔴 **Paso 7 — Gateway REST (`gateway/internal/...`)**: client + DTOs + mappers + handler + rutas.
 
-**Estado actual:** Feature #1 (Members Management) **100% completada y lista para Pull Request a `main`**.
+**Micro-tarea actual:** el usuario está iniciando la creación del proto en `proto/prayers/v1/prayers.proto`.
+
+**Estado actual:** Feature #1 (Members) mergeada a `main`. Empezando **Feature #2 (Prayers Management)**.
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
