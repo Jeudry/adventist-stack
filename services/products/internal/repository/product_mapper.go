@@ -34,7 +34,7 @@ func toCreateParams(p domain.Product) db.CreateProductParams {
 		Description: p.Description,
 		Brand:       p.Brand,
 		ReleaseDate: p.ReleaseDate,
-		Status:      string(p.Status),
+		Status:      int16(p.Status),
 	}
 }
 
@@ -46,7 +46,7 @@ func toUpdateParams(p domain.Product) db.UpdateProductParams {
 		Description: p.Description,
 		Brand:       p.Brand,
 		ReleaseDate: p.ReleaseDate,
-		Status:      string(p.Status),
+		Status:      int16(p.Status),
 	}
 }
 

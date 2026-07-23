@@ -17,7 +17,7 @@ type Product struct {
 	Description *string
 	Brand       *string
 	ReleaseDate *time.Time
-	Status      string
+	Status      int16
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   *time.Time

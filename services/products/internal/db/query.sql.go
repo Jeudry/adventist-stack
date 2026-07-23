@@ -40,7 +40,7 @@ type CreateProductParams struct {
 	Description *string
 	Brand       *string
 	ReleaseDate *time.Time
-	Status      string
+	Status      int16
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
@@ -174,7 +174,7 @@ type UpdateProductParams struct {
 	Description *string
 	Brand       *string
 	ReleaseDate *time.Time
-	Status      string
+	Status      int16
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
