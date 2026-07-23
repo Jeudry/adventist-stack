@@ -3,12 +3,9 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
 
 	membersv1 "github.com/Jeudry/adventist-stack/gen/members/v1"
 	"github.com/go-chi/chi/v5"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type MembersHandler struct {
@@ -19,43 +16,6 @@ func NewMembersHandler(client membersv1.MemberServiceClient) *MembersHandler {
 	return &MembersHandler{
 		client: client,
 	}
-}
-
-type CreateMemberRequest struct {
-	FirstName   string  `json:"first_name"`
-	LastName    string  `json:"last_name"`
-	Email       *string `json:"email,omitempty"`
-	Phone       *string `json:"phone,omitempty"`
-	Gender      string  `json:"gender"`
-	Address     *string `json:"address,omitempty"`
-	BirthDate   *string `json:"birth_date,omitempty"`   // Formato "YYYY-MM-DD"
-	BaptismDate *string `json:"baptism_date,omitempty"` // Formato "YYYY-MM-DD"
-	Status      string  `json:"status,omitempty"`
-}
-
-type UpdateMemberRequest struct {
-	FirstName   string  `json:"first_name"`
-	LastName    string  `json:"last_name"`
-	Email       *string `json:"email,omitempty"`
-	Phone       *string `json:"phone,omitempty"`
-	Gender      string  `json:"gender"`
-	Address     *string `json:"address,omitempty"`
-	BirthDate   *string `json:"birth_date,omitempty"`   // Formato "YYYY-MM-DD"
-	BaptismDate *string `json:"baptism_date,omitempty"` // Formato "YYYY-MM-DD"
-	Status      string  `json:"status,omitempty"`
-}
-
-type MemberVM struct {
-	BaseVM
-	FirstName   string  `json:"first_name"`
-	LastName    string  `json:"last_name"`
-	Email       *string `json:"email,omitempty"`
-	Phone       *string `json:"phone,omitempty"`
-	Gender      string  `json:"gender"`
-	Address     *string `json:"address,omitempty"`
-	BirthDate   *string `json:"birth_date,omitempty"`   // Formato "YYYY-MM-DD"
-	BaptismDate *string `json:"baptism_date,omitempty"` // Formato "YYYY-MM-DD"
-	Status      string  `json:"status"`
 }
 
 func (h *MembersHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -182,53 +142,4 @@ func (h *MembersHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func toMemberVM(m *membersv1.Member) MemberVM {
-	if m == nil {
-		return MemberVM{}
-	}
-
-	return MemberVM{
-		BaseVM:      toBaseVM(m.GetId(), m.GetCreatedAt(), m.GetUpdatedAt()),
-		FirstName:   m.GetFirstName(),
-		LastName:    m.GetLastName(),
-		Email:       m.Email,
-		Phone:       m.Phone,
-		Gender:      m.GetGender(),
-		Address:     m.Address,
-		BirthDate:   formatDatePtr(m.GetBirthDate()),
-		BaptismDate: formatDatePtr(m.GetBaptismDate()),
-		Status:      m.GetStatus().String(),
-	}
-}
-
-func parseDatePtr(s *string) (*timestamppb.Timestamp, error) {
-	if s == nil || *s == "" {
-		return nil, nil
-	}
-	t, err := time.Parse("2006-01-02", *s)
-	if err != nil {
-		return nil, err
-	}
-	return timestamppb.New(t), nil
-}
-
-func formatDatePtr(ts *timestamppb.Timestamp) *string {
-	if ts == nil {
-		return nil
-	}
-	s := ts.AsTime().Format("2006-01-02")
-	return &s
-}
-
-func statusToProto(s string) membersv1.MemberStatus {
-	switch strings.ToLower(s) {
-	case "inactive":
-		return membersv1.MemberStatus_MEMBER_STATUS_INACTIVE
-	case "visitor":
-		return membersv1.MemberStatus_MEMBER_STATUS_VISITOR
-	default:
-		return membersv1.MemberStatus_MEMBER_STATUS_ACTIVE
-	}
 }

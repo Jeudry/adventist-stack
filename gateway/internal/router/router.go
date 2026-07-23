@@ -16,6 +16,7 @@ import (
 type Deps struct {
 	JWT            *jwt.Manager
 	AuthHandler    *handlers.AuthHandler
+	MembersHandler *handlers.MembersHandler
 	AllowedOrigins []string
 	RateLimit      int
 	RateWindow     time.Duration
@@ -52,6 +53,14 @@ func New(d Deps) http.Handler {
 				func(req *http.Request) string { return middleware.UserID(req.Context()) },
 				func(req *http.Request) string { return middleware.Role(req.Context()) },
 			))
+
+			r.Route("/members", func(r chi.Router) {
+				r.Post("/", d.MembersHandler.Create)
+				r.Get("/", d.MembersHandler.List)
+				r.Get("/{id}", d.MembersHandler.GetByID)
+				r.Put("/{id}", d.MembersHandler.Update)
+				r.Delete("/{id}", d.MembersHandler.Delete)
+			})
 		})
 	})
 

@@ -58,6 +58,7 @@ func main() {
 	handler := router.New(router.Deps{
 		JWT:            jwtManager,
 		AuthHandler:    handlers.NewAuthHandler(grpcClients.Auth),
+		MembersHandler: handlers.NewMembersHandler(grpcClients.Members),
 		AllowedOrigins: strings.Split(cfg.AllowedOrigins, ","),
 		RateLimit:      cfg.RateLimit,
 		RateWindow:     cfg.RateWindow,
