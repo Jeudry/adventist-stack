@@ -27,21 +27,19 @@ func NewMemberService(repo memberRepository) *MemberService {
 }
 
 func (s MemberService) Create(ctx context.Context, member domain.Member) (domain.Member, error) {
-	m := member.Normalize()
-	if err := m.Validate(); err != nil {
+	member.Normalize()
+	if err := member.Validate(); err != nil {
 		return domain.Member{}, err
 	}
 
-	return s.repo.Create(ctx, m)
+	return s.repo.Create(ctx, member)
 }
 
 func (s MemberService) GetByID(ctx context.Context, member domain.Member) (domain.Member, error) {
 	return s.repo.GetByID(ctx, member.ID)
 }
 
-func (s MemberService) RetrieveList(ctx context.Context, req pagination.ListRequest) (pagination.Page[domain.Member], error) {
-	q := req.ToQuery()
-
+func (s MemberService) RetrieveList(ctx context.Context, q pagination.Query) (pagination.Page[domain.Member], error) {
 	items, err := s.repo.RetrieveList(ctx, q)
 	if err != nil {
 		return pagination.Page[domain.Member]{}, err
@@ -59,12 +57,12 @@ func (s MemberService) Update(ctx context.Context, member domain.Member) (domain
 		return domain.Member{}, fmt.Errorf("%w: domain update id is required", domain.ErrorInvalidMember)
 	}
 
-	m := member.Normalize()
-	if err := m.Validate(); err != nil {
+	member.Normalize()
+	if err := member.Validate(); err != nil {
 		return domain.Member{}, err
 	}
 
-	return s.repo.Update(ctx, m)
+	return s.repo.Update(ctx, member)
 }
 
 func (s MemberService) Delete(ctx context.Context, id uuid.UUID) error {

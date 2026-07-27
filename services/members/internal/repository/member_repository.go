@@ -32,7 +32,7 @@ func (r *MemberRepository) Create(ctx context.Context, m domain.Member) (domain.
 }
 
 func (r *MemberRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Member, error) {
-	p, err := r.q.GetMemberByID(ctx, id)
+	m, err := r.q.GetMemberByID(ctx, id)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return domain.Member{}, domain.ErrMemberNotFound
 	}
@@ -40,7 +40,7 @@ func (r *MemberRepository) GetByID(ctx context.Context, id uuid.UUID) (domain.Me
 		return domain.Member{}, fmt.Errorf("repository: get member: %w", err)
 	}
 
-	return toDomain(p)
+	return toDomain(m)
 }
 
 func (r *MemberRepository) RetrieveList(ctx context.Context, q pagination.Query) ([]domain.Member, error) {

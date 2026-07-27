@@ -21,9 +21,9 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	PrayerService_CreatePrayer_FullMethodName = "/prayers.v1.PrayerService/CreatePrayer"
 	PrayerService_GetPrayer_FullMethodName    = "/prayers.v1.PrayerService/GetPrayer"
-	PrayerService_ListPrayers_FullMethodName  = "/prayers.v1.PrayerService/ListPrayers"
 	PrayerService_UpdatePrayer_FullMethodName = "/prayers.v1.PrayerService/UpdatePrayer"
 	PrayerService_DeletePrayer_FullMethodName = "/prayers.v1.PrayerService/DeletePrayer"
+	PrayerService_ListPrayers_FullMethodName  = "/prayers.v1.PrayerService/ListPrayers"
 )
 
 // PrayerServiceClient is the client API for PrayerService service.
@@ -32,9 +32,9 @@ const (
 type PrayerServiceClient interface {
 	CreatePrayer(ctx context.Context, in *CreatePrayerRequest, opts ...grpc.CallOption) (*Prayer, error)
 	GetPrayer(ctx context.Context, in *GetPrayerRequest, opts ...grpc.CallOption) (*Prayer, error)
-	ListPrayers(ctx context.Context, in *ListPrayersRequest, opts ...grpc.CallOption) (*ListPrayersResponse, error)
 	UpdatePrayer(ctx context.Context, in *UpdatePrayerRequest, opts ...grpc.CallOption) (*Prayer, error)
 	DeletePrayer(ctx context.Context, in *DeletePrayerRequest, opts ...grpc.CallOption) (*DeletePrayerResponse, error)
+	ListPrayers(ctx context.Context, in *ListPrayersRequest, opts ...grpc.CallOption) (*ListPrayersResponse, error)
 }
 
 type prayerServiceClient struct {
@@ -65,16 +65,6 @@ func (c *prayerServiceClient) GetPrayer(ctx context.Context, in *GetPrayerReques
 	return out, nil
 }
 
-func (c *prayerServiceClient) ListPrayers(ctx context.Context, in *ListPrayersRequest, opts ...grpc.CallOption) (*ListPrayersResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListPrayersResponse)
-	err := c.cc.Invoke(ctx, PrayerService_ListPrayers_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *prayerServiceClient) UpdatePrayer(ctx context.Context, in *UpdatePrayerRequest, opts ...grpc.CallOption) (*Prayer, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Prayer)
@@ -95,15 +85,25 @@ func (c *prayerServiceClient) DeletePrayer(ctx context.Context, in *DeletePrayer
 	return out, nil
 }
 
+func (c *prayerServiceClient) ListPrayers(ctx context.Context, in *ListPrayersRequest, opts ...grpc.CallOption) (*ListPrayersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPrayersResponse)
+	err := c.cc.Invoke(ctx, PrayerService_ListPrayers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PrayerServiceServer is the server API for PrayerService service.
 // All implementations must embed UnimplementedPrayerServiceServer
 // for forward compatibility.
 type PrayerServiceServer interface {
 	CreatePrayer(context.Context, *CreatePrayerRequest) (*Prayer, error)
 	GetPrayer(context.Context, *GetPrayerRequest) (*Prayer, error)
-	ListPrayers(context.Context, *ListPrayersRequest) (*ListPrayersResponse, error)
 	UpdatePrayer(context.Context, *UpdatePrayerRequest) (*Prayer, error)
 	DeletePrayer(context.Context, *DeletePrayerRequest) (*DeletePrayerResponse, error)
+	ListPrayers(context.Context, *ListPrayersRequest) (*ListPrayersResponse, error)
 	mustEmbedUnimplementedPrayerServiceServer()
 }
 
@@ -120,14 +120,14 @@ func (UnimplementedPrayerServiceServer) CreatePrayer(context.Context, *CreatePra
 func (UnimplementedPrayerServiceServer) GetPrayer(context.Context, *GetPrayerRequest) (*Prayer, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPrayer not implemented")
 }
-func (UnimplementedPrayerServiceServer) ListPrayers(context.Context, *ListPrayersRequest) (*ListPrayersResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListPrayers not implemented")
-}
 func (UnimplementedPrayerServiceServer) UpdatePrayer(context.Context, *UpdatePrayerRequest) (*Prayer, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdatePrayer not implemented")
 }
 func (UnimplementedPrayerServiceServer) DeletePrayer(context.Context, *DeletePrayerRequest) (*DeletePrayerResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeletePrayer not implemented")
+}
+func (UnimplementedPrayerServiceServer) ListPrayers(context.Context, *ListPrayersRequest) (*ListPrayersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListPrayers not implemented")
 }
 func (UnimplementedPrayerServiceServer) mustEmbedUnimplementedPrayerServiceServer() {}
 func (UnimplementedPrayerServiceServer) testEmbeddedByValue()                       {}
@@ -186,24 +186,6 @@ func _PrayerService_GetPrayer_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PrayerService_ListPrayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListPrayersRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PrayerServiceServer).ListPrayers(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PrayerService_ListPrayers_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PrayerServiceServer).ListPrayers(ctx, req.(*ListPrayersRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _PrayerService_UpdatePrayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdatePrayerRequest)
 	if err := dec(in); err != nil {
@@ -240,6 +222,24 @@ func _PrayerService_DeletePrayer_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PrayerService_ListPrayers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPrayersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PrayerServiceServer).ListPrayers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PrayerService_ListPrayers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PrayerServiceServer).ListPrayers(ctx, req.(*ListPrayersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PrayerService_ServiceDesc is the grpc.ServiceDesc for PrayerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -256,16 +256,16 @@ var PrayerService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PrayerService_GetPrayer_Handler,
 		},
 		{
-			MethodName: "ListPrayers",
-			Handler:    _PrayerService_ListPrayers_Handler,
-		},
-		{
 			MethodName: "UpdatePrayer",
 			Handler:    _PrayerService_UpdatePrayer_Handler,
 		},
 		{
 			MethodName: "DeletePrayer",
 			Handler:    _PrayerService_DeletePrayer_Handler,
+		},
+		{
+			MethodName: "ListPrayers",
+			Handler:    _PrayerService_ListPrayers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

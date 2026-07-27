@@ -17,6 +17,7 @@ type Deps struct {
 	JWT            *jwt.Manager
 	AuthHandler    *handlers.AuthHandler
 	MembersHandler *handlers.MembersHandler
+	PrayersHandler *handlers.PrayersHandler	
 	AllowedOrigins []string
 	RateLimit      int
 	RateWindow     time.Duration
@@ -60,6 +61,14 @@ func New(d Deps) http.Handler {
 				r.Get("/{id}", d.MembersHandler.GetByID)
 				r.Put("/{id}", d.MembersHandler.Update)
 				r.Delete("/{id}", d.MembersHandler.Delete)
+			})
+
+			r.Route("/prayers", func(r chi.Router) {
+				r.Get("/", d.PrayersHandler.List)
+				r.Get("/{id}", d.PrayersHandler.GetByID)
+				r.Post("/", d.PrayersHandler.Create)
+				r.Put("/{id}", d.PrayersHandler.Update)
+				r.Delete("/{id}", d.PrayersHandler.Delete)
 			})
 		})
 	})

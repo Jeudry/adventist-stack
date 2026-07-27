@@ -108,7 +108,7 @@ type Member struct {
 	Status      Status
 }
 
-func (m Member) Normalize() Member {
+func (m *Member) Normalize() {
 	m.FirstName = strings.TrimSpace(m.FirstName)
 	m.LastName = strings.TrimSpace(m.LastName)
 	m.Address = strutil.TrimPtr(m.Address)
@@ -116,8 +116,6 @@ func (m Member) Normalize() Member {
 	if m.Status == 0 {
 		m.Status = StatusActive
 	}
-
-	return m
 }
 
 func (m Member) Validate() error {

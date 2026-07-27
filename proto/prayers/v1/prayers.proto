@@ -46,30 +46,30 @@ message UpdatePrayerRequest {
 }
 
 message DeletePrayerRequest {
-  string id = 1;
+    string id = 1;
 }
 
 message DeletePrayerResponse {
-  bool deleted = 1;
+  string id = 1;
 }
 
 message ListPrayersRequest {
-  int32 page = 1;
-  int32 page_size = 2;
-  optional string search = 3;
+    int32 page = 1;
+    int32 page_size = 2;
+    optional string search = 3;
 }
 
 message ListPrayersResponse {
-  repeated Prayer items = 1;
-  int32 total = 2;
-  int32 page = 3;
-  int32 page_size = 4;
+    repeated Prayer items = 1;
+    int32 total = 2;
+    int32 page = 3;
+    int32 page_size = 4;
 }
 
 service PrayerService {
-  rpc CreatePrayer(CreatePrayerRequest) returns (Prayer);
-  rpc GetPrayer(GetPrayerRequest) returns (Prayer);
-  rpc ListPrayers(ListPrayersRequest) returns (ListPrayersResponse);
-  rpc UpdatePrayer(UpdatePrayerRequest) returns (Prayer);
-  rpc DeletePrayer(DeletePrayerRequest) returns (DeletePrayerResponse);
+    rpc CreatePrayer(CreatePrayerRequest) returns (Prayer);
+    rpc GetPrayer(GetPrayerRequest) returns (Prayer);
+    rpc UpdatePrayer(UpdatePrayerRequest) returns (Prayer);
+    rpc DeletePrayer(DeletePrayerRequest) returns (DeletePrayerResponse);
+    rpc ListPrayers(ListPrayersRequest) returns (ListPrayersResponse);
 }

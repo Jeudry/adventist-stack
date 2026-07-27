@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func memberFromCreate(req *membersv1.CreateMemberRequest) (domain.Member, error) {
+func memberFromCreateRequest(req *membersv1.CreateMemberRequest) (domain.Member, error) {
 	email, err := vo.NewOptionalEmail(req.Email)
 	if err != nil {
 		return domain.Member{}, err
@@ -38,7 +38,7 @@ func memberFromCreate(req *membersv1.CreateMemberRequest) (domain.Member, error)
 	}, nil
 }
 
-func memberFromUpdate(req *membersv1.UpdateMemberRequest, id uuid.UUID) (domain.Member, error) {
+func memberFromUpdateRequest(req *membersv1.UpdateMemberRequest, id uuid.UUID) (domain.Member, error) {
 	email, err := vo.NewOptionalEmail(req.Email)
 	if err != nil {
 		return domain.Member{}, err

@@ -24,6 +24,7 @@ type Config struct {
 	AuthAddr          string        `env:"AUTH_GRPC_ADDR" envDefault:"localhost:50051"`
 	NotificationsAddr string        `env:"NOTIFICATIONS_GRPC_ADDR" envDefault:"localhost:50054"`
 	MembersAddr       string        `env:"MEMBERS_GRPC_ADDR" envDefault:"localhost:50052"`
+	PrayersAddr       string        `env:"PRAYERS_GRPC_ADDR" envDefault:"localhost:50055"`
 	AllowedOrigins    string        `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
 	RateLimit         int           `env:"RATE_LIMIT_REQUESTS" envDefault:"100"`
 	RateWindow        time.Duration `env:"RATE_LIMIT_WINDOW" envDefault:"1m"`
@@ -44,6 +45,7 @@ func main() {
 		AuthAddr:          cfg.AuthAddr,
 		NotificationsAddr: cfg.NotificationsAddr,
 		MembersAddr:       cfg.MembersAddr,
+		PrayersAddr:       cfg.PrayersAddr,
 	})
 	if err != nil {
 		log.Error("failed to create gRPC clients", "err", err)
@@ -57,6 +59,7 @@ func main() {
 		JWT:            jwtManager,
 		AuthHandler:    handlers.NewAuthHandler(grpcClients.Auth),
 		MembersHandler: handlers.NewMembersHandler(grpcClients.Members),
+		PrayersHandler: handlers.NewPrayersHandler(grpcClients.Prayers),
 		AllowedOrigins: strings.Split(cfg.AllowedOrigins, ","),
 		RateLimit:      cfg.RateLimit,
 		RateWindow:     cfg.RateWindow,

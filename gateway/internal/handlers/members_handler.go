@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	membersv1 "github.com/Jeudry/adventist-stack/gen/members/v1"
-	"github.com/go-chi/chi/v5"
+	"github.com/Jeudry/adventist-stack/gateway/internal/mappers"
+	"github.com/Jeudry/adventist-stack/gateway/internal/models/base"
+	"github.com/Jeudry/adventist-stack/gateway/internal/models/member"
 )
 
 type MembersHandler struct {
@@ -19,123 +20,111 @@ func NewMembersHandler(client membersv1.MemberServiceClient) *MembersHandler {
 }
 
 func (h *MembersHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req CreateMemberRequest
+	var req member.CreateMemberRequest
 	if err := decodeJSON(r, &req); err != nil {
 		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid JSON"})
 		return
 	}
 
-	birthDate, err := parseDatePtr(req.BirthDate)
+	protoReq, err := mappers.ToCreateMemberProto(req)
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid birth_date format, use YYYY-MM-DD"})
-		return
-	}
-	baptismDate, err := parseDatePtr(req.BaptismDate)
-	if err != nil {
-		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid baptism_date format, use YYYY-MM-DD"})
+		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	res, err := h.client.CreateMember(r.Context(), &membersv1.CreateMemberRequest{
-		FirstName:   req.FirstName,
-		LastName:    req.LastName,
-		Email:       req.Email,
-		Phone:       req.Phone,
-		Gender:      req.Gender,
-		Address:     req.Address,
-		BirthDate:   birthDate,
-		BaptismDate: baptismDate,
-		Status:      statusToProto(req.Status),
-	})
+	res, err := h.client.CreateMember(r.Context(), protoReq)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	writeJSON(w, http.StatusCreated, toMemberVM(res))
+	writeJSON(w, http.StatusCreated, mappers.ToMemberVM(res))
 }
 
 func (h *MembersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	res, err := h.client.GetMember(r.Context(), &membersv1.GetMemberRequest{Id: id})
+	id := r.PathValue("id")
+	if id == "" {
+		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "id is required"})
+		return
+	}
+
+	protoReq := &membersv1.GetMemberRequest{Id: id}
+	res, err := h.client.GetMember(r.Context(), protoReq)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toMemberVM(res))
+	writeJSON(w, http.StatusOK, mappers.ToMemberVM(res))
 }
 
 func (h *MembersHandler) List(w http.ResponseWriter, r *http.Request) {
-	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
-	pageSize, _ := strconv.Atoi(r.URL.Query().Get("page_size"))
-	search := r.URL.Query().Get("search")
+	query := parseListQuery(r)
 
-	res, err := h.client.ListMembers(r.Context(), &membersv1.ListMembersRequest{
-		Page:     int32(page),
-		PageSize: int32(pageSize),
-		Search:   &search,
-	})
+	protoReq := &membersv1.ListMembersRequest{
+		Page:     query.Page,
+		PageSize: query.PageSize,
+		Search:   &query.Search,
+	}
+
+	res, err := h.client.ListMembers(r.Context(), protoReq)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	items := make([]MemberVM, len(res.GetItems()))
+	items := make([]member.MemberVM, len(res.GetItems()))
 	for i, m := range res.GetItems() {
-		items[i] = toMemberVM(m)
+		items[i] = mappers.ToMemberVM(m)
 	}
 
-	writeJSON(w, http.StatusOK, PageResponse[MemberVM]{
+	pageResp := base.PageResponse[member.MemberVM]{
 		Items:    items,
 		Total:    res.GetTotal(),
 		Page:     res.GetPage(),
 		PageSize: res.GetPageSize(),
-	})
+	}
+
+	writeJSON(w, http.StatusOK, pageResp)
 }
 
 func (h *MembersHandler) Update(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	var req UpdateMemberRequest
+	id := r.PathValue("id")
+	if id == "" {
+		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "id is required"})
+		return
+	}
+
+	var req member.UpdateMemberRequest
 	if err := decodeJSON(r, &req); err != nil {
 		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid JSON"})
 		return
 	}
 
-	birthDate, err := parseDatePtr(req.BirthDate)
+	protoReq, err := mappers.ToUpdateMemberProto(id, req)
 	if err != nil {
-		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid birth_date format, use YYYY-MM-DD"})
-		return
-	}
-	baptismDate, err := parseDatePtr(req.BaptismDate)
-	if err != nil {
-		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "invalid baptism_date format, use YYYY-MM-DD"})
+		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: err.Error()})
 		return
 	}
 
-	res, err := h.client.UpdateMember(r.Context(), &membersv1.UpdateMemberRequest{
-		Id:          id,
-		FirstName:   req.FirstName,
-		LastName:    req.LastName,
-		Email:       req.Email,
-		Phone:       req.Phone,
-		Gender:      req.Gender,
-		Address:     req.Address,
-		BirthDate:   birthDate,
-		BaptismDate: baptismDate,
-		Status:      statusToProto(req.Status),
-	})
+	res, err := h.client.UpdateMember(r.Context(), protoReq)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	writeJSON(w, http.StatusOK, toMemberVM(res))
+	writeJSON(w, http.StatusOK, mappers.ToMemberVM(res))
 }
 
 func (h *MembersHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	_, err := h.client.DeleteMember(r.Context(), &membersv1.DeleteMemberRequest{Id: id})
+	id := r.PathValue("id")
+	if id == "" {
+		writeJSON(w, http.StatusBadRequest, ErrorResponse{Error: "id is required"})
+		return
+	}
+
+	protoReq := &membersv1.DeleteMemberRequest{Id: id}
+	_, err := h.client.DeleteMember(r.Context(), protoReq)
 	if err != nil {
 		writeError(w, err)
 		return

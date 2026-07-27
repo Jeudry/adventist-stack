@@ -424,7 +424,7 @@ func (x *DeletePrayerRequest) GetId() string {
 
 type DeletePrayerResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Deleted       bool                   `protobuf:"varint,1,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -459,11 +459,11 @@ func (*DeletePrayerResponse) Descriptor() ([]byte, []int) {
 	return file_prayers_v1_prayers_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *DeletePrayerResponse) GetDeleted() bool {
+func (x *DeletePrayerResponse) GetId() string {
 	if x != nil {
-		return x.Deleted
+		return x.Id
 	}
-	return false
+	return ""
 }
 
 type ListPrayersRequest struct {
@@ -633,9 +633,9 @@ const file_prayers_v1_prayers_proto_rawDesc = "" +
 	"\x06status\x18\x06 \x01(\x0e2\x18.prayers.v1.PrayerStatusR\x06statusB\x0e\n" +
 	"\f_author_name\"%\n" +
 	"\x13DeletePrayerRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"0\n" +
-	"\x14DeletePrayerResponse\x12\x18\n" +
-	"\adeleted\x18\x01 \x01(\bR\adeleted\"m\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"&\n" +
+	"\x14DeletePrayerResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"m\n" +
 	"\x12ListPrayersRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x1b\n" +
 	"\tpage_size\x18\x02 \x01(\x05R\bpageSize\x12\x1b\n" +
@@ -653,10 +653,10 @@ const file_prayers_v1_prayers_proto_rawDesc = "" +
 	"\x16PRAYER_STATUS_ARCHIVED\x10\x032\xfb\x02\n" +
 	"\rPrayerService\x12C\n" +
 	"\fCreatePrayer\x12\x1f.prayers.v1.CreatePrayerRequest\x1a\x12.prayers.v1.Prayer\x12=\n" +
-	"\tGetPrayer\x12\x1c.prayers.v1.GetPrayerRequest\x1a\x12.prayers.v1.Prayer\x12N\n" +
-	"\vListPrayers\x12\x1e.prayers.v1.ListPrayersRequest\x1a\x1f.prayers.v1.ListPrayersResponse\x12C\n" +
+	"\tGetPrayer\x12\x1c.prayers.v1.GetPrayerRequest\x1a\x12.prayers.v1.Prayer\x12C\n" +
 	"\fUpdatePrayer\x12\x1f.prayers.v1.UpdatePrayerRequest\x1a\x12.prayers.v1.Prayer\x12Q\n" +
-	"\fDeletePrayer\x12\x1f.prayers.v1.DeletePrayerRequest\x1a .prayers.v1.DeletePrayerResponseB<Z:github.com/Jeudry/adventist-stack/gen/prayers/v1;prayersv1b\x06proto3"
+	"\fDeletePrayer\x12\x1f.prayers.v1.DeletePrayerRequest\x1a .prayers.v1.DeletePrayerResponse\x12N\n" +
+	"\vListPrayers\x12\x1e.prayers.v1.ListPrayersRequest\x1a\x1f.prayers.v1.ListPrayersResponseB<Z:github.com/Jeudry/adventist-stack/gen/prayers/v1;prayersv1b\x06proto3"
 
 var (
 	file_prayers_v1_prayers_proto_rawDescOnce sync.Once
@@ -693,14 +693,14 @@ var file_prayers_v1_prayers_proto_depIdxs = []int32{
 	1,  // 5: prayers.v1.ListPrayersResponse.items:type_name -> prayers.v1.Prayer
 	2,  // 6: prayers.v1.PrayerService.CreatePrayer:input_type -> prayers.v1.CreatePrayerRequest
 	3,  // 7: prayers.v1.PrayerService.GetPrayer:input_type -> prayers.v1.GetPrayerRequest
-	7,  // 8: prayers.v1.PrayerService.ListPrayers:input_type -> prayers.v1.ListPrayersRequest
-	4,  // 9: prayers.v1.PrayerService.UpdatePrayer:input_type -> prayers.v1.UpdatePrayerRequest
-	5,  // 10: prayers.v1.PrayerService.DeletePrayer:input_type -> prayers.v1.DeletePrayerRequest
+	4,  // 8: prayers.v1.PrayerService.UpdatePrayer:input_type -> prayers.v1.UpdatePrayerRequest
+	5,  // 9: prayers.v1.PrayerService.DeletePrayer:input_type -> prayers.v1.DeletePrayerRequest
+	7,  // 10: prayers.v1.PrayerService.ListPrayers:input_type -> prayers.v1.ListPrayersRequest
 	1,  // 11: prayers.v1.PrayerService.CreatePrayer:output_type -> prayers.v1.Prayer
 	1,  // 12: prayers.v1.PrayerService.GetPrayer:output_type -> prayers.v1.Prayer
-	8,  // 13: prayers.v1.PrayerService.ListPrayers:output_type -> prayers.v1.ListPrayersResponse
-	1,  // 14: prayers.v1.PrayerService.UpdatePrayer:output_type -> prayers.v1.Prayer
-	6,  // 15: prayers.v1.PrayerService.DeletePrayer:output_type -> prayers.v1.DeletePrayerResponse
+	1,  // 13: prayers.v1.PrayerService.UpdatePrayer:output_type -> prayers.v1.Prayer
+	6,  // 14: prayers.v1.PrayerService.DeletePrayer:output_type -> prayers.v1.DeletePrayerResponse
+	8,  // 15: prayers.v1.PrayerService.ListPrayers:output_type -> prayers.v1.ListPrayersResponse
 	11, // [11:16] is the sub-list for method output_type
 	6,  // [6:11] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name

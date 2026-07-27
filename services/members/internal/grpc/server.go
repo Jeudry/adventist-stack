@@ -25,7 +25,7 @@ func NewServer(svc *service.MemberService) *Server {
 }
 
 func (s *Server) CreateMember(ctx context.Context, req *membersv1.CreateMemberRequest) (*membersv1.Member, error) {
-	member, err := memberFromCreate(req)
+	member, err := memberFromCreateRequest(req)
 	if err != nil {
 		return nil, toStatus(err)
 	}
@@ -53,7 +53,7 @@ func (s *Server) ListMembers(ctx context.Context, req *membersv1.ListMembersRequ
 		Page:     int(req.Page),
 		PageSize: int(req.PageSize),
 		Search:   ptr.Deref(req.Search),
-	})
+	}.ToQuery())
 	if err != nil {
 		return nil, toStatus(err)
 	}
@@ -74,7 +74,7 @@ func (s *Server) UpdateMember(ctx context.Context, req *membersv1.UpdateMemberRe
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid id")
 	}
-	member, err := memberFromUpdate(req, id)
+	member, err := memberFromUpdateRequest(req, id)
 	if err != nil {
 		return nil, toStatus(err)
 	}

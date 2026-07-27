@@ -9,17 +9,15 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 **Feature activa:** peticiones de oración (`services/prayers`), rama `feature/2-Prayers_Management`, Ticket #2.
 
 **Roadmap de la feature:**
-- 🚧 **Paso 1 — Contrato Protobuf (`.proto`)**: `proto/prayers/v1/prayers.proto` y `make proto` ← **acá estamos ahora**.
-- 🔴 **Paso 2 — Migración + DB (`sqlc`)**: `services/prayers/migrations` y `query.sql`.
-- 🔴 **Paso 3 — Dominio (`services/prayers/internal/domain`)**: entidad `Prayer` y enum `Status`.
-- 🔴 **Paso 4 — Repositorio (`services/prayers/internal/repository`)**: repo + mappers.
-- 🔴 **Paso 5 — Servicio (`services/prayers/internal/service`)**: lógica de negocio.
-- 🔴 **Paso 6 — Capa gRPC + Wiring (`services/prayers/internal/grpc` y `cmd/server/main.go`)**.
-- 🔴 **Paso 7 — Gateway REST (`gateway/internal/...`)**: client + DTOs + mappers + handler + rutas.
+- ✅ **Paso 1 — Contrato Protobuf (`.proto`)**: `proto/prayers/v1/prayers.proto` y `make proto`.
+- ✅ **Paso 2 — Migración + DB (`sqlc`)**: `services/prayers/migrations` y `query.sql`.
+- ✅ **Paso 3 — Dominio (`services/prayers/internal/domain`)**: entidad `Prayer` y enum `Status`.
+- ✅ **Paso 4 — Repositorio (`services/prayers/internal/repository`)**: repo + mappers.
+- ✅ **Paso 5 — Servicio (`services/prayers/internal/service`)**: lógica de negocio.
+- ✅ **Paso 6 — Capa gRPC + Wiring (`services/prayers/internal/grpc` y `cmd/server/main.go`)**.
+- ✅ **Paso 7 — Gateway REST (`gateway/internal/...`)**: client + DTOs/models + mappers + handler + rutas.
 
-**Micro-tarea actual:** el usuario está iniciando la creación del proto en `proto/prayers/v1/prayers.proto`.
-
-**Estado actual:** Feature #1 (Members) mergeada a `main`. Empezando **Feature #2 (Prayers Management)**.
+**Estado actual:** Feature #2 (Prayers Management) **100% completada y verificada**.
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
