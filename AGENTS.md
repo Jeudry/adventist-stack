@@ -6,18 +6,18 @@ Guía para agentes de IA (Claude, Gemini, etc.) que trabajan en este repo. Leer 
 
 ## 🔴 En qué estamos AHORA (handoff — leer primero)
 
-**Feature activa:** peticiones de oración (`services/prayers`), rama `feature/2-Prayers_Management`, Ticket #2.
+**Feature activa:** escuela sabática (`services/sabbath_school`), rama `feature/3-Sabbath_School_Management`, Ticket #3.
 
 **Roadmap de la feature:**
-- ✅ **Paso 1 — Contrato Protobuf (`.proto`)**: `proto/prayers/v1/prayers.proto` y `make proto`.
-- ✅ **Paso 2 — Migración + DB (`sqlc`)**: `services/prayers/migrations` y `query.sql`.
-- ✅ **Paso 3 — Dominio (`services/prayers/internal/domain`)**: entidad `Prayer` y enum `Status`.
-- ✅ **Paso 4 — Repositorio (`services/prayers/internal/repository`)**: repo + mappers.
-- ✅ **Paso 5 — Servicio (`services/prayers/internal/service`)**: lógica de negocio.
-- ✅ **Paso 6 — Capa gRPC + Wiring (`services/prayers/internal/grpc` y `cmd/server/main.go`)**.
-- ✅ **Paso 7 — Gateway REST (`gateway/internal/...`)**: client + DTOs/models + mappers + handler + rutas.
+- 🚧 **Paso 1 — Contrato Protobuf (`.proto`)**: `proto/sabbath_school/v1/sabbath_school.proto` y `make proto` ← **acá estamos ahora**.
+- 🔴 **Paso 2 — Migración + DB (`sqlc`)**: `services/sabbath_school/migrations` y `query.sql`.
+- 🔴 **Paso 3 — Dominio (`services/sabbath_school/internal/domain`)**: entidades y enums.
+- 🔴 **Paso 4 — Repositorio (`services/sabbath_school/internal/repository`)**: repo + mappers.
+- 🔴 **Paso 5 — Servicio (`services/sabbath_school/internal/service`)**: lógica de negocio.
+- 🔴 **Paso 6 — Capa gRPC + Wiring (`services/sabbath_school/internal/grpc` y `cmd/server/main.go`)**.
+- 🔴 **Paso 7 — Gateway REST (`gateway/internal/...`)**: client + models + mappers + handler + rutas.
 
-**Estado actual:** Feature #2 (Prayers Management) **100% completada y verificada**.
+**Estado actual:** Iniciando **Feature #3 (Sabbath School Management)**.
 
 **Cómo se está guiando (teaching mode):** el usuario **escribe members él mismo** para aprender. El agente:
 1. Da **moldes** en `products` (servicio de referencia) y `auth`, explica el porqué, y **revisa/corrige** lo que el usuario escribe (a veces manda screenshots de errores del compilador).
