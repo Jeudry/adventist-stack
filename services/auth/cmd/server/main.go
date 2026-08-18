@@ -2,28 +2,26 @@ package main
 
 import (
 	"context"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/go-chi/chi/v5"
 
-	authv1 "github.com/Jeudry/adventist-stack/gen/auth/v1"
 	"github.com/Jeudry/adventist-stack/pkg/config"
 	"github.com/Jeudry/adventist-stack/pkg/database"
+	"github.com/Jeudry/adventist-stack/pkg/httpx"
 	"github.com/Jeudry/adventist-stack/pkg/jwt"
 	"github.com/Jeudry/adventist-stack/pkg/logger"
 	auth "github.com/Jeudry/adventist-stack/services/auth"
-	authgrpc "github.com/Jeudry/adventist-stack/services/auth/internal/grpc"
+	authhttp "github.com/Jeudry/adventist-stack/services/auth/internal/http"
 	"github.com/Jeudry/adventist-stack/services/auth/internal/repository"
 	"github.com/Jeudry/adventist-stack/services/auth/internal/service"
 )
 
 type Config struct {
 	Env      string `env:"ENV" envDefault:"dev"`
-	GRPCPort string `env:"AUTH_GRPC_PORT" envDefault:"50051"`
+	HTTPPort string `env:"AUTH_HTTP_PORT" envDefault:"50051"`
 	Postgres config.Postgres
 	JWT      config.JWT
 }
@@ -57,25 +55,14 @@ func main() {
 	repo := repository.NewUserRepository(pool)
 	svc := service.New(repo, jwtManager)
 
-	grpcServer := grpc.NewServer()
-	authv1.RegisterAuthServiceServer(grpcServer, authgrpc.NewServer(svc))
-	reflection.Register(grpcServer)
-
-	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
-	if err != nil {
-		log.Error("failed to listen", "port", cfg.GRPCPort, "err", err)
+	if err := httpx.Serve(ctx, cfg.HTTPPort, api(svc), log); err != nil {
+		log.Error("http server", "err", err)
 		os.Exit(1)
 	}
+}
 
-	go func() {
-		log.Info("servicio auth escuchando", "port", cfg.GRPCPort)
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Error("grpc server", "err", err)
-			os.Exit(1)
-		}
-	}()
-
-	<-ctx.Done()
-	log.Info("shutting down auth service...")
-	grpcServer.GracefulStop()
+func api(svc *service.AuthService) *chi.Mux {
+	router := chi.NewRouter()
+	authhttp.NewHandler(svc).Register(httpx.NewAPI(router, "Auth"))
+	return router
 }

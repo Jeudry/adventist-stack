@@ -1,0 +1,10 @@
+ALTER TABLE users ALTER COLUMN role DROP DEFAULT;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+ALTER TABLE users
+    ALTER COLUMN role TYPE SMALLINT
+    USING (CASE role
+        WHEN 'admin' THEN 1
+        WHEN 'member' THEN 2
+        ELSE 2
+    END);
+ALTER TABLE users ALTER COLUMN role SET DEFAULT 2;

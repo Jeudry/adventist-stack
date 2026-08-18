@@ -2,27 +2,24 @@ package main
 
 import (
 	"context"
-	"net"
+	"github.com/go-chi/chi/v5"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-
-	membersv1 "github.com/Jeudry/adventist-stack/gen/members/v1"
 	"github.com/Jeudry/adventist-stack/pkg/config"
 	"github.com/Jeudry/adventist-stack/pkg/database"
+	"github.com/Jeudry/adventist-stack/pkg/httpx"
 	"github.com/Jeudry/adventist-stack/pkg/logger"
 	members "github.com/Jeudry/adventist-stack/services/members"
-	membersgrpc "github.com/Jeudry/adventist-stack/services/members/internal/grpc"
+	membershttp "github.com/Jeudry/adventist-stack/services/members/internal/http"
 	"github.com/Jeudry/adventist-stack/services/members/internal/repository"
 	"github.com/Jeudry/adventist-stack/services/members/internal/service"
 )
 
 type Config struct {
 	Env      string `env:"ENV" envDefault:"dev"`
-	GRPCPort string `env:"MEMBERS_GRPC_PORT" envDefault:"50052"`
+	HTTPPort string `env:"MEMBERS_HTTP_PORT" envDefault:"50052"`
 	Postgres config.Postgres
 }
 
@@ -54,25 +51,14 @@ func main() {
 	repo := repository.NewMemberRepository(pool)
 	svc := service.NewMemberService(repo)
 
-	grpcServer := grpc.NewServer()
-	membersv1.RegisterMemberServiceServer(grpcServer, membersgrpc.NewServer(svc))
-	reflection.Register(grpcServer)
-
-	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
-	if err != nil {
-		log.Error("failed to listen", "port", cfg.GRPCPort, "err", err)
+	if err := httpx.Serve(ctx, cfg.HTTPPort, api(svc), log); err != nil {
+		log.Error("http server", "err", err)
 		os.Exit(1)
 	}
+}
 
-	go func() {
-		log.Info("members service listening", "port", cfg.GRPCPort)
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Error("grpc server", "err", err)
-			os.Exit(1)
-		}
-	}()
-
-	<-ctx.Done()
-	log.Info("shutting down members service...")
-	grpcServer.GracefulStop()
+func api(svc *service.MemberService) *chi.Mux {
+	router := chi.NewRouter()
+	membershttp.NewHandler(svc).Register(httpx.NewAPI(router, "Members"))
+	return router
 }

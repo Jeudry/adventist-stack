@@ -12,7 +12,11 @@ CREATE TABLE IF NOT EXISTS members (
     birth_date   DATE,
     baptism_date DATE,
     created_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    updated_at   TIMESTAMPTZ  NOT NULL DEFAULT now()
+    created_by   UUID         NOT NULL,
+    updated_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_by   UUID,
+    deleted_at   TIMESTAMPTZ,
+    deleted_by   UUID
 );
 
 CREATE INDEX IF NOT EXISTS idx_members_email ON members (email);

@@ -28,7 +28,7 @@ func (s *NotificationService) SendEmail(_ context.Context, to, template string, 
 
 type Notification struct {
 	ID     string `json:"id"`
-	UserID string `json:"user_id"`
+	UserID string `json:"userId"`
 	Title  string `json:"title"`
 	Body   string `json:"body"`
 }

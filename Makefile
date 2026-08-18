@@ -1,5 +1,4 @@
 .DEFAULT_GOAL := help
-MODULE := github.com/Jeudry/adventist-stack
 # Lee DATABASE_URL desde .env para los comandos de migración.
 DB_URL := $(shell grep -E '^DATABASE_URL=' .env 2>/dev/null | cut -d= -f2-)
 # DSN con tabla de migraciones POR SERVICIO, para que sus versiones no choquen
@@ -10,13 +9,6 @@ MIGRATE_DB = "$(DB_URL)&x-migrations-table=$(svc)_schema_migrations"
 help: ## Muestra esta ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
-
-.PHONY: proto
-proto: ## Genera el código Go desde los .proto
-	protoc -I proto \
-		--go_out=. --go_opt=module=$(MODULE) \
-		--go-grpc_out=. --go-grpc_opt=module=$(MODULE) \
-		$$(find proto -name '*.proto')
 
 .PHONY: tidy
 tidy: ## Ordena dependencias (go mod tidy)
@@ -52,6 +44,14 @@ migrate-version: ## Muestra la versión aplicada: make migrate-version svc=<serv
 migrate-force: ## Fuerza una versión (arregla estado 'dirty'): make migrate-force svc=<servicio> version=<N>
 	@[ -n "$(svc)" ] && [ -n "$(version)" ] || { echo "Uso: make migrate-force svc=<servicio> version=<N>"; exit 1; }
 	migrate -path services/$(svc)/migrations -database $(MIGRATE_DB) force $(version)
+
+.PHONY: migrate-all
+migrate-all: ## Aplica las migraciones de TODOS los servicios (tabla por servicio)
+	go run ./scripts/migrateall
+
+.PHONY: test-integration
+test-integration: ## Corre los tests contra la DB real (requiere: make infra-up && make migrate-all)
+	go test -tags=integration -count=1 ./...
 
 .PHONY: build
 build: ## Compila los tres binarios en ./bin

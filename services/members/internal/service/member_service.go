@@ -15,7 +15,7 @@ type memberRepository interface {
 	RetrieveList(ctx context.Context, pq pagination.Query) ([]domain.Member, error)
 	Count(ctx context.Context, pq pagination.Query) (int, error)
 	Update(ctx context.Context, m domain.Member) (domain.Member, error)
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, id, deletedBy uuid.UUID) error
 }
 
 type MemberService struct {
@@ -65,6 +65,6 @@ func (s MemberService) Update(ctx context.Context, member domain.Member) (domain
 	return s.repo.Update(ctx, member)
 }
 
-func (s MemberService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.repo.Delete(ctx, id)
+func (s MemberService) Delete(ctx context.Context, id, deletedBy uuid.UUID) error {
+	return s.repo.Delete(ctx, id, deletedBy)
 }

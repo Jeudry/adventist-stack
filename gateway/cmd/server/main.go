@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,25 +9,26 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Jeudry/adventist-stack/gateway/internal/clients"
-	"github.com/Jeudry/adventist-stack/gateway/internal/handlers"
+	"github.com/Jeudry/adventist-stack/gateway/internal/openapi"
+	"github.com/Jeudry/adventist-stack/gateway/internal/proxy"
 	"github.com/Jeudry/adventist-stack/gateway/internal/router"
 	"github.com/Jeudry/adventist-stack/pkg/config"
+	"github.com/Jeudry/adventist-stack/pkg/httpx"
 	"github.com/Jeudry/adventist-stack/pkg/jwt"
 	"github.com/Jeudry/adventist-stack/pkg/logger"
 )
 
 type Config struct {
-	Env               string        `env:"ENV" envDefault:"dev"`
-	HTTPPort          string        `env:"GATEWAY_HTTP_PORT" envDefault:"8080"`
-	AuthAddr          string        `env:"AUTH_GRPC_ADDR" envDefault:"localhost:50051"`
-	NotificationsAddr string        `env:"NOTIFICATIONS_GRPC_ADDR" envDefault:"localhost:50054"`
-	MembersAddr       string        `env:"MEMBERS_GRPC_ADDR" envDefault:"localhost:50052"`
-	PrayersAddr       string        `env:"PRAYERS_GRPC_ADDR" envDefault:"localhost:50055"`
-	AllowedOrigins    string        `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
-	RateLimit         int           `env:"RATE_LIMIT_REQUESTS" envDefault:"100"`
-	RateWindow        time.Duration `env:"RATE_LIMIT_WINDOW" envDefault:"1m"`
-	JWT               config.JWT
+	Env              string        `env:"ENV" envDefault:"dev"`
+	HTTPPort         string        `env:"GATEWAY_HTTP_PORT" envDefault:"8080"`
+	AuthURL          string        `env:"AUTH_URL" envDefault:"http://localhost:50051"`
+	MembersURL       string        `env:"MEMBERS_URL" envDefault:"http://localhost:50052"`
+	PrayersURL       string        `env:"PRAYERS_URL" envDefault:"http://localhost:50055"`
+	SabbathSchoolURL string        `env:"SABBATH_SCHOOL_URL" envDefault:"http://localhost:50056"`
+	AllowedOrigins   string        `env:"CORS_ALLOWED_ORIGINS" envDefault:"*"`
+	RateLimit        int           `env:"RATE_LIMIT_REQUESTS" envDefault:"100"`
+	RateWindow       time.Duration `env:"RATE_LIMIT_WINDOW" envDefault:"1m"`
+	JWT              config.JWT
 }
 
 func main() {
@@ -41,47 +41,50 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	grpcClients, err := clients.New(clients.Config{
-		AuthAddr:          cfg.AuthAddr,
-		NotificationsAddr: cfg.NotificationsAddr,
-		MembersAddr:       cfg.MembersAddr,
-		PrayersAddr:       cfg.PrayersAddr,
-	})
-	if err != nil {
-		log.Error("failed to create gRPC clients", "err", err)
-		os.Exit(1)
+	// Every service declares its full public path, so the gateway forwards the
+	// request untouched: no prefix is stripped on the way through.
+	targets := map[string]string{
+		"/api/v1/auth":            cfg.AuthURL,
+		"/api/v1/members":         cfg.MembersURL,
+		"/api/v1/prayers":         cfg.PrayersURL,
+		"/api/v1/sabbath-schools": cfg.SabbathSchoolURL,
 	}
-	defer grpcClients.Close()
+	upstreams := make(map[string]http.Handler, len(targets))
+	for mount, target := range targets {
+		handler, err := proxy.To(target, log)
+		if err != nil {
+			log.Error("invalid upstream URL", "mount", mount, "target", target, "err", err)
+			os.Exit(1)
+		}
+		upstreams[mount] = handler
+	}
 
 	jwtManager := jwt.NewManager(cfg.JWT.Secret, cfg.JWT.Issuer, cfg.JWT.AccessTTL, cfg.JWT.RefreshTTL)
 
-	handler := router.New(router.Deps{
+	merger := openapi.NewMerger("Adventist Stack API", "1.0.0", []openapi.Upstream{
+		{Name: "auth", URL: cfg.AuthURL},
+		{Name: "members", URL: cfg.MembersURL},
+		{Name: "prayers", URL: cfg.PrayersURL},
+		{Name: "sabbath_school", URL: cfg.SabbathSchoolURL},
+	}, log)
+
+	handler, gatewayAPI := router.New(router.Deps{
 		JWT:            jwtManager,
-		AuthHandler:    handlers.NewAuthHandler(grpcClients.Auth),
-		MembersHandler: handlers.NewMembersHandler(grpcClients.Members),
-		PrayersHandler: handlers.NewPrayersHandler(grpcClients.Prayers),
+		Auth:           upstreams["/api/v1/auth"],
+		Members:        upstreams["/api/v1/members"],
+		Prayers:        upstreams["/api/v1/prayers"],
+		SabbathSchool:  upstreams["/api/v1/sabbath-schools"],
+		OpenAPI:        merger.Handler(),
 		AllowedOrigins: strings.Split(cfg.AllowedOrigins, ","),
 		RateLimit:      cfg.RateLimit,
 		RateWindow:     cfg.RateWindow,
 	})
 
-	srv := &http.Server{
-		Addr:              ":" + cfg.HTTPPort,
-		Handler:           handler,
-		ReadHeaderTimeout: 10 * time.Second,
+	merger.IncludeLocal(gatewayAPI)
+
+	log.Info("gateway ready", "swagger", "/swagger")
+	if err := httpx.Serve(ctx, cfg.HTTPPort, handler, log); err != nil {
+		log.Error("http server", "err", err)
+		os.Exit(1)
 	}
-
-	go func() {
-		log.Info("gateway listening", "port", cfg.HTTPPort, "swagger", "/swagger")
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Error("http server", "err", err)
-			os.Exit(1)
-		}
-	}()
-
-	<-ctx.Done()
-	log.Info("shutting down gateway...")
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	_ = srv.Shutdown(shutdownCtx)
 }

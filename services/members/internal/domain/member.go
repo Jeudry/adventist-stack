@@ -20,26 +20,16 @@ const (
 	MaxBaptismAge   = 130
 )
 
-type Status int
+type Status string
 
 const (
-	StatusActive Status = iota + 1
-	StatusInactive
-	StatusVisitor
+	StatusUnspecified Status = ""
+	StatusActive      Status = "active"
+	StatusInactive    Status = "inactive"
+	StatusVisitor     Status = "visitor"
 )
 
-func (s Status) String() string {
-	switch s {
-	case StatusActive:
-		return "active"
-	case StatusInactive:
-		return "inactive"
-	case StatusVisitor:
-		return "visitor"
-	default:
-		return "unknown"
-	}
-}
+func (s Status) String() string { return string(s) }
 
 func (s Status) IsValid() bool {
 	switch s {
@@ -50,35 +40,34 @@ func (s Status) IsValid() bool {
 	}
 }
 
-type Gender int
+// ParseStatus maps external text (e.g. "Active", " visitor ") to a Status, or
+// the zero value when it does not match a known status.
+func ParseStatus(s string) Status {
+	candidate := Status(strings.ToLower(strings.TrimSpace(s)))
+	if candidate.IsValid() {
+		return candidate
+	}
+	return StatusUnspecified
+}
+
+type Gender string
 
 const (
-	GenderMale Gender = iota + 1
-	GenderFemale
+	GenderUnspecified Gender = ""
+	GenderMale        Gender = "M"
+	GenderFemale      Gender = "F"
 )
 
-func (g Gender) String() string {
-	switch g {
-	case GenderMale:
-		return "M"
-	case GenderFemale:
-		return "F"
-	default:
-		return ""
-	}
-}
+func (g Gender) String() string { return string(g) }
 
 // ParseGender maps external text (e.g. "m", " F ") to a Gender, or the zero
 // value when it does not match a known gender.
 func ParseGender(s string) Gender {
-	switch strings.ToUpper(strings.TrimSpace(s)) {
-	case "M":
-		return GenderMale
-	case "F":
-		return GenderFemale
-	default:
-		return Gender(0)
+	candidate := Gender(strings.ToUpper(strings.TrimSpace(s)))
+	if candidate.IsValid() {
+		return candidate
 	}
+	return GenderUnspecified
 }
 
 func (g Gender) IsValid() bool {
@@ -113,7 +102,7 @@ func (m *Member) Normalize() {
 	m.LastName = strings.TrimSpace(m.LastName)
 	m.Address = strutil.TrimPtr(m.Address)
 
-	if m.Status == 0 {
+	if m.Status == StatusUnspecified {
 		m.Status = StatusActive
 	}
 }
@@ -187,6 +176,8 @@ func validateGender(gender Gender) error {
 
 func validateAddress(address *string) error {
 	switch {
+	case address == nil:
+		return nil
 	case len(*address) < AddressMinLen:
 		return fmt.Errorf("%w: address must be at least %d characters", ErrorInvalidMember, AddressMinLen)
 	case len(*address) > AddressMaxLen:

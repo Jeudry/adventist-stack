@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Jeudry/adventist-stack/pkg/entity"
+	"github.com/Jeudry/adventist-stack/pkg/strutil"
 )
 
 const (
@@ -17,37 +18,34 @@ const (
 	AuthorNameMaxLen  = 256
 )
 
-type Status int
+type Status string
 
 const (
-	STATUS_UNSPECIFIED Status = iota + 1
-	STATUS_PENDING
-	STATUS_ANSWERED
-	STATUS_ARCHIVED
+	STATUS_UNSPECIFIED Status = ""
+	STATUS_PENDING     Status = "pending"
+	STATUS_ANSWERED    Status = "answered"
+	STATUS_ARCHIVED    Status = "archived"
 )
 
-func (s Status) String() string {
-	switch s {
-	case STATUS_UNSPECIFIED:
-		return "unspecified"
-	case STATUS_PENDING:
-		return "pending"
-	case STATUS_ANSWERED:
-		return "answered"
-	case STATUS_ARCHIVED:
-		return "archived"
-	default:
-		return "unknown"
-	}
-}
+func (s Status) String() string { return string(s) }
 
 func (s Status) IsValid() bool {
 	switch s {
-	case STATUS_UNSPECIFIED, STATUS_PENDING, STATUS_ANSWERED, STATUS_ARCHIVED:
+	case STATUS_PENDING, STATUS_ANSWERED, STATUS_ARCHIVED:
 		return true
 	default:
 		return false
 	}
+}
+
+// ParseStatus maps external text (e.g. "Pending", " archived ") to a Status, or
+// the zero value when it does not match a known status.
+func ParseStatus(s string) Status {
+	candidate := Status(strings.ToLower(strings.TrimSpace(s)))
+	if candidate.IsValid() {
+		return candidate
+	}
+	return STATUS_UNSPECIFIED
 }
 
 var (
@@ -60,15 +58,24 @@ type Prayer struct {
 	entity.Base
 	Title       string
 	Description string
-	AuthorName  string
-	IsAnonymous bool
-	Status      Status
+	// nil is an anonymous prayer. One field instead of a name plus a flag, so
+	// "anonymous but with a name" is not a state anything can construct.
+	AuthorName *string
+	Status     Status
 }
 
 func (p *Prayer) Normalize() {
-	p.AuthorName = strings.TrimSpace(p.AuthorName)
+	// A name that trims to nothing is the same as not having one.
+	p.AuthorName = strutil.TrimPtr(p.AuthorName)
 	p.Title = strings.TrimSpace(p.Title)
 	p.Description = strings.TrimSpace(p.Description)
+
+	// A request that omits the status gets the one it starts life with, the
+	// same value the column defaults to. Without this the API rejects a body
+	// the spec declares valid.
+	if p.Status == STATUS_UNSPECIFIED {
+		p.Status = STATUS_PENDING
+	}
 }
 
 func (p Prayer) Validate() error {
@@ -83,7 +90,7 @@ func (p Prayer) Validate() error {
 func validateTitle(title string) error {
 	switch {
 	case len(title) < TitleMinLen || len(title) > TitleMaxLen:
-		return fmt.Errorf("title must be between %d and %d characters", TitleMinLen, TitleMaxLen)
+		return fmt.Errorf("%w: title must be between %d and %d characters", ErrInvalidPrayer, TitleMinLen, TitleMaxLen)
 	default:
 		return nil
 	}
@@ -92,16 +99,20 @@ func validateTitle(title string) error {
 func validateDescription(description string) error {
 	switch {
 	case len(description) < DescriptionMinLen || len(description) > DescriptionMaxLen:
-		return fmt.Errorf("description must be between %d and %d characters", DescriptionMinLen, DescriptionMaxLen)
+		return fmt.Errorf("%w: description must be between %d and %d characters", ErrInvalidPrayer, DescriptionMinLen, DescriptionMaxLen)
 	default:
 		return nil
 	}
 }
 
-func validateAuthorName(authorName string) error {
+// No author at all is valid — that is an anonymous prayer, and it keeps no name
+// to leak. A name that is present has to be a real one.
+func validateAuthorName(authorName *string) error {
 	switch {
-	case len(authorName) < AuthorNameMinLen || len(authorName) > AuthorNameMaxLen:
-		return fmt.Errorf("author name must be between %d and %d characters", AuthorNameMinLen, AuthorNameMaxLen)
+	case authorName == nil:
+		return nil
+	case len(*authorName) < AuthorNameMinLen || len(*authorName) > AuthorNameMaxLen:
+		return fmt.Errorf("%w: author name must be between %d and %d characters", ErrInvalidPrayer, AuthorNameMinLen, AuthorNameMaxLen)
 	default:
 		return nil
 	}

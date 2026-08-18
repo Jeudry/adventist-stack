@@ -1,8 +1,10 @@
 package vo_test
 
 import (
-	"errors"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/Jeudry/adventist-stack/pkg/vo"
 )
@@ -21,12 +23,8 @@ func TestNewPhone_Valid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			phone, err := vo.NewPhone(tc.raw)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if phone.String() != tc.want {
-				t.Fatalf("got %q, want %q", phone.String(), tc.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, phone.String())
 		})
 	}
 }
@@ -44,9 +42,7 @@ func TestNewPhone_Invalid(t *testing.T) {
 	for name, raw := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := vo.NewPhone(raw)
-			if !errors.Is(err, vo.ErrInvalidPhone) {
-				t.Fatalf("got %v, want ErrInvalidPhone", err)
-			}
+			assert.ErrorIs(t, err, vo.ErrInvalidPhone)
 		})
 	}
 }
@@ -58,20 +54,14 @@ func TestNewOptionalPhone(t *testing.T) {
 	for name, raw := range map[string]*string{"nil": nil, "blank": &blank} {
 		t.Run(name+" is zero", func(t *testing.T) {
 			p, err := vo.NewOptionalPhone(raw)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if !p.IsZero() || p.Ptr() != nil {
-				t.Fatal("optional phone should be the zero value")
-			}
+			require.NoError(t, err)
+			assert.True(t, p.IsZero(), "an absent phone must be the zero value")
+			assert.Nil(t, p.Ptr(), "Ptr() must stay nil so the column stores NULL")
 		})
 	}
 
 	p, err := vo.NewOptionalPhone(&valid)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if got := p.Ptr(); got == nil || *got != "8095551234" {
-		t.Fatalf("Ptr() = %v, want 8095551234", got)
-	}
+	require.NoError(t, err)
+	require.NotNil(t, p.Ptr(), "Ptr()")
+	assert.Equal(t, "8095551234", *p.Ptr(), "Ptr()")
 }

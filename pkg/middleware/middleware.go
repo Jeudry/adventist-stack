@@ -35,11 +35,14 @@ func Auth(manager *jwt.Manager) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), userIDKey, claims.Subject)
-			ctx = context.WithValue(ctx, roleKey, claims.Role)
-			next.ServeHTTP(w, r.WithContext(ctx))
+			next.ServeHTTP(w, r.WithContext(WithCaller(r.Context(), claims.Subject, claims.Role)))
 		})
 	}
+}
+
+// WithCaller records who the request belongs to, once the token proved it.
+func WithCaller(ctx context.Context, userID, role string) context.Context {
+	return context.WithValue(context.WithValue(ctx, userIDKey, userID), roleKey, role)
 }
 
 func UserID(ctx context.Context) string {

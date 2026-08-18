@@ -1,16 +1,20 @@
 package handlers
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/Jeudry/adventist-stack/pkg/httpx"
+)
 
 func Health(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+	httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func Me(userIDFn, roleFn func(r *http.Request) string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, map[string]string{
-			"user_id": userIDFn(r),
-			"role":    roleFn(r),
+		httpx.WriteJSON(w, http.StatusOK, map[string]string{
+			"userId": userIDFn(r),
+			"role":   roleFn(r),
 		})
 	}
 }

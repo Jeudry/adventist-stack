@@ -3,77 +3,70 @@ package repository
 import (
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+
 	"github.com/Jeudry/adventist-stack/pkg/entity"
-	"github.com/Jeudry/adventist-stack/pkg/pagination"
 	"github.com/Jeudry/adventist-stack/pkg/vo"
-	"github.com/Jeudry/adventist-stack/services/members/internal/db"
 	"github.com/Jeudry/adventist-stack/services/members/internal/domain"
 )
 
-func toDomain(m db.Member) (domain.Member, error) {
-	email, err := vo.NewOptionalEmail(m.Email)
+// row is what pgx.Row and pgx.Rows have in common, so one scan serves the single-row queries and
+// the list alike.
+type row interface {
+	Scan(dest ...any) error
+}
+
+// The order here must match memberColumns exactly. Email and phone are value objects with their
+// own validation, which is why the crossing can fail on the way out of the database.
+func scanMember(r row) (domain.Member, error) {
+	var (
+		m         domain.Member
+		base      entity.Base
+		rawEmail  *string
+		rawPhone  *string
+		rawGender string
+		rawStatus string
+	)
+
+	err := r.Scan(
+		&base.ID, &m.FirstName, &m.LastName, &rawEmail, &rawPhone, &rawGender, &rawStatus,
+		&m.BirthDate, &m.BaptismDate, &m.Address,
+		&base.CreatedAt, &base.CreatedBy, &base.UpdatedAt, &base.UpdatedBy, &base.DeletedAt, &base.DeletedBy,
+	)
 	if err != nil {
-		return domain.Member{}, fmt.Errorf("repository: rehydrate email: %w", err)
+		return domain.Member{}, err
 	}
-	phone, err := vo.NewOptionalPhone(m.Phone)
+
+	email, err := vo.NewOptionalEmail(rawEmail)
 	if err != nil {
-		return domain.Member{}, fmt.Errorf("repository: rehydrate phone: %w", err)
+		return domain.Member{}, fmt.Errorf("rehydrate email: %w", err)
 	}
-	return domain.Member{
-		Base: entity.Base{
-			ID:        m.ID,
-			CreatedAt: m.CreatedAt,
-			UpdatedAt: m.UpdatedAt,
-			DeletedAt: m.DeletedAt,
-			CreatedBy: m.CreatedBy,
-			UpdatedBy: m.UpdatedBy,
-			DeletedBy: m.DeletedBy,
-		},
-		FirstName:   m.FirstName,
-		LastName:    m.LastName,
-		Email:       email,
-		Phone:       phone,
-		Gender:      domain.Gender(m.Gender),
-		Address:     m.Address,
-		BirthDate:   m.BirthDate,
-		BaptismDate: m.BaptismDate,
-		Status:      domain.Status(m.Status),
-	}, nil
+	phone, err := vo.NewOptionalPhone(rawPhone)
+	if err != nil {
+		return domain.Member{}, fmt.Errorf("rehydrate phone: %w", err)
+	}
+
+	m.Base = base
+	m.Email = email
+	m.Phone = phone
+	m.Gender = domain.Gender(rawGender)
+	m.Status = domain.Status(rawStatus)
+	return m, nil
 }
 
-func toCreateParams(m domain.Member) db.CreateMemberParams {
-	return db.CreateMemberParams{
-		FirstName:   m.FirstName,
-		LastName:    m.LastName,
-		Email:       m.Email.Ptr(),
-		Phone:       m.Phone.Ptr(),
-		Gender:      int16(m.Gender),
-		Address:     m.Address,
-		BirthDate:   m.BirthDate,
-		BaptismDate: m.BaptismDate,
-		Status:      int16(m.Status),
-	}
-}
-
-func toUpdateParams(m domain.Member) db.UpdateMemberParams {
-	return db.UpdateMemberParams{
-		ID:          m.ID,
-		FirstName:   m.FirstName,
-		LastName:    m.LastName,
-		Email:       m.Email.Ptr(),
-		Phone:       m.Phone.Ptr(),
-		Gender:      int16(m.Gender),
-		Address:     m.Address,
-		BirthDate:   m.BirthDate,
-		BaptismDate: m.BaptismDate,
-		Status:      int16(m.Status),
-	}
-}
-
-func toMemberListParams(q pagination.Query) db.ListMembersParams {
-	return db.ListMembersParams{
-		Search:    q.Search,
-		RowLimit:  int32(q.Limit),
-		RowOffset: int32(q.Offset),
+// writableArgs carries the columns the client owns. The insert takes it whole; the update swaps
+// created_by for updated_by, so neither statement can quietly write the other's audit column.
+func writableArgs(m domain.Member) pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{
+		"first_name":   m.FirstName,
+		"last_name":    m.LastName,
+		"email":        m.Email.Ptr(),
+		"phone":        m.Phone.Ptr(),
+		"gender":       m.Gender.String(),
+		"address":      m.Address,
+		"birth_date":   m.BirthDate,
+		"baptism_date": m.BaptismDate,
+		"status":       m.Status.String(),
+		"created_by":   m.CreatedBy,
 	}
 }

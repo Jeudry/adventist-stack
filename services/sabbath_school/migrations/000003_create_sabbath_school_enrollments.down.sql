@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS sabbath_school_enrollments;

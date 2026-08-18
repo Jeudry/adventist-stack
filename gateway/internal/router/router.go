@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
 
@@ -15,15 +17,19 @@ import (
 
 type Deps struct {
 	JWT            *jwt.Manager
-	AuthHandler    *handlers.AuthHandler
-	MembersHandler *handlers.MembersHandler
-	PrayersHandler *handlers.PrayersHandler	
+	Auth           http.Handler
+	Members        http.Handler
+	Prayers        http.Handler
+	SabbathSchool  http.Handler
+	OpenAPI        http.HandlerFunc
 	AllowedOrigins []string
 	RateLimit      int
 	RateWindow     time.Duration
 }
 
-func New(d Deps) http.Handler {
+// New returns the gateway handler plus the spec of what the gateway answers
+// itself, so it can be merged with the ones the services generate.
+func New(d Deps) (http.Handler, huma.API) {
 	r := chi.NewRouter()
 
 	r.Use(chimw.RequestID)
@@ -33,45 +39,31 @@ func New(d Deps) http.Handler {
 	r.Use(middleware.CORS(d.AllowedOrigins))
 	r.Use(middleware.RateLimit(d.RateLimit, d.RateWindow))
 
-	r.Get("/health", handlers.Health)
-
 	r.Get("/swagger", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		_, _ = w.Write(api.SwaggerHTML)
 	})
-	r.Get("/openapi.yaml", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "application/yaml")
-		_, _ = w.Write(api.OpenAPISpec)
+	r.Get("/openapi.json", d.OpenAPI)
+
+	// The gateway's own two operations. This API only describes them; the
+	// document clients read is the merged one served above.
+	config := huma.DefaultConfig("Gateway", "1.0.0")
+	config.CreateHooks = nil
+	config.DocsPath = ""
+	config.OpenAPIPath = ""
+	gatewayAPI := humachi.New(r, config)
+	handlers.Register(gatewayAPI, d.JWT)
+
+	// Registration and login are the only way in, so they are the only routes
+	// reachable without a token.
+	r.Mount("/api/v1/auth", d.Auth)
+
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.Auth(d.JWT))
+		r.Mount("/api/v1/members", d.Members)
+		r.Mount("/api/v1/prayers", d.Prayers)
+		r.Mount("/api/v1/sabbath-schools", d.SabbathSchool)
 	})
 
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Post("/auth/register", d.AuthHandler.Register)
-		r.Post("/auth/login", d.AuthHandler.Login)
-
-		r.Group(func(r chi.Router) {
-			r.Use(middleware.Auth(d.JWT))
-			r.Get("/me", handlers.Me(
-				func(req *http.Request) string { return middleware.UserID(req.Context()) },
-				func(req *http.Request) string { return middleware.Role(req.Context()) },
-			))
-
-			r.Route("/members", func(r chi.Router) {
-				r.Post("/", d.MembersHandler.Create)
-				r.Get("/", d.MembersHandler.List)
-				r.Get("/{id}", d.MembersHandler.GetByID)
-				r.Put("/{id}", d.MembersHandler.Update)
-				r.Delete("/{id}", d.MembersHandler.Delete)
-			})
-
-			r.Route("/prayers", func(r chi.Router) {
-				r.Get("/", d.PrayersHandler.List)
-				r.Get("/{id}", d.PrayersHandler.GetByID)
-				r.Post("/", d.PrayersHandler.Create)
-				r.Put("/{id}", d.PrayersHandler.Update)
-				r.Delete("/{id}", d.PrayersHandler.Delete)
-			})
-		})
-	})
-
-	return r
+	return r, gatewayAPI
 }

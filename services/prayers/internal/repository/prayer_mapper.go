@@ -1,70 +1,48 @@
 package repository
 
 import (
+	"github.com/jackc/pgx/v5"
+
 	"github.com/Jeudry/adventist-stack/pkg/entity"
-	"github.com/Jeudry/adventist-stack/pkg/pagination"
-	"github.com/Jeudry/adventist-stack/services/prayers/internal/db"
 	"github.com/Jeudry/adventist-stack/services/prayers/internal/domain"
 )
 
-func toDomain(m db.Prayer) (domain.Prayer, error) {
-	return domain.Prayer{
-		Title:       m.Title,
-		Description: m.Description,
-		AuthorName:  *m.AuthorName,
-		IsAnonymous: m.IsAnonymous,
-		Status:      domain.Status(m.Status),
-		Base: entity.Base{
-			ID:        m.ID,
-			CreatedAt: m.CreatedAt,
-			CreatedBy: m.CreatedBy,
-			UpdatedAt: m.UpdatedAt,
-			UpdatedBy: m.UpdatedBy,
-			DeletedAt: m.DeletedAt,
-			DeletedBy: m.DeletedBy,
-		},
-	}, nil
+// row is what pgx.Row and pgx.Rows have in common, so one scan serves the single-row queries and
+// the list alike.
+type row interface {
+	Scan(dest ...any) error
 }
 
-func toCreateParams(p domain.Prayer) db.CreatePayerParams {
-	var authorName *string
-	if p.AuthorName != "" {
-		authorName = &p.AuthorName
+// The order here must match prayerColumns exactly. A NULL author_name is an anonymous prayer, and
+// it stays a nil pointer all the way into the entity.
+func scanPrayer(r row) (domain.Prayer, error) {
+	var (
+		p         domain.Prayer
+		base      entity.Base
+		rawStatus string
+	)
+
+	err := r.Scan(
+		&base.ID, &p.Title, &p.Description, &p.AuthorName, &rawStatus,
+		&base.CreatedAt, &base.CreatedBy, &base.UpdatedAt, &base.UpdatedBy, &base.DeletedAt, &base.DeletedBy,
+	)
+	if err != nil {
+		return domain.Prayer{}, err
 	}
 
-	return db.CreatePayerParams{
-		ID:          p.ID,
-		Title:       p.Title,
-		Description: p.Description,
-		AuthorName:  authorName,
-		IsAnonymous: p.IsAnonymous,
-		Status:      int32(p.Status),
-		CreatedAt:   p.CreatedAt,
-		UpdatedAt:   p.UpdatedAt,
-	}
+	p.Base = base
+	p.Status = domain.Status(rawStatus)
+	return p, nil
 }
 
-func toUpdateParams(p domain.Prayer) db.UpdatePrayerParams {
-	var authorName *string
-	if p.AuthorName != "" {
-		authorName = &p.AuthorName
-	}
-
-	return db.UpdatePrayerParams{
-		ID:          p.ID,
-		Title:       p.Title,
-		Description: p.Description,
-		AuthorName:  authorName,
-		IsAnonymous: p.IsAnonymous,
-		Status:      int32(p.Status),
-		UpdatedBy:   p.UpdatedBy,
-	}
-}
-
-func toListParams(q pagination.Query) db.ListPrayersParams {
-	return db.ListPrayersParams{
-		Search:    q.Search,
-		RowOffset: int32(q.Offset),
-		RowLimit:  int32(q.Limit),
+// writableArgs carries the columns the client owns. The insert takes it whole; the update swaps
+// created_by for updated_by, so neither statement can quietly write the other's audit column.
+func writableArgs(p domain.Prayer) pgx.StrictNamedArgs {
+	return pgx.StrictNamedArgs{
+		"title":       p.Title,
+		"description": p.Description,
+		"author_name": p.AuthorName,
+		"status":      p.Status.String(),
+		"created_by":  p.CreatedBy,
 	}
 }

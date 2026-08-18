@@ -15,7 +15,7 @@ type prayerRepository interface {
 	RetrieveList(ctx context.Context, pq pagination.Query) ([]domain.Prayer, error)
 	Count(ctx context.Context, pq pagination.Query) (int, error)
 	Update(ctx context.Context, p domain.Prayer) (domain.Prayer, error)
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, id, deletedBy uuid.UUID) error
 }
 
 type PrayerService struct {
@@ -65,6 +65,6 @@ func (s *PrayerService) Update(ctx context.Context, p domain.Prayer) (domain.Pra
 	return s.prayerRepo.Update(ctx, p)
 }
 
-func (s *PrayerService) Delete(ctx context.Context, id uuid.UUID) error {
-	return s.prayerRepo.Delete(ctx, id)
+func (s *PrayerService) Delete(ctx context.Context, id, deletedBy uuid.UUID) error {
+	return s.prayerRepo.Delete(ctx, id, deletedBy)
 }

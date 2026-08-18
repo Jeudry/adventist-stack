@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     role          VARCHAR(20)  NOT NULL DEFAULT 'member',
     created_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by    UUID         NOT NULL,
     updated_at    TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 

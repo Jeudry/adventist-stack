@@ -2,28 +2,25 @@ package main
 
 import (
 	"context"
+	"github.com/go-chi/chi/v5"
 	"html/template"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-
-	notificationsv1 "github.com/Jeudry/adventist-stack/gen/notifications/v1"
 	"github.com/Jeudry/adventist-stack/pkg/config"
+	"github.com/Jeudry/adventist-stack/pkg/httpx"
 	"github.com/Jeudry/adventist-stack/pkg/logger"
 	"github.com/Jeudry/adventist-stack/pkg/mailer"
 	"github.com/Jeudry/adventist-stack/pkg/redis"
 	notifications "github.com/Jeudry/adventist-stack/services/notifications"
-	notifgrpc "github.com/Jeudry/adventist-stack/services/notifications/internal/grpc"
+	notifhttp "github.com/Jeudry/adventist-stack/services/notifications/internal/http"
 	"github.com/Jeudry/adventist-stack/services/notifications/internal/service"
 )
 
 type Config struct {
 	Env      string `env:"ENV" envDefault:"dev"`
-	GRPCPort string `env:"NOTIFICATIONS_GRPC_PORT" envDefault:"50052"`
+	HTTPPort string `env:"NOTIFICATIONS_HTTP_PORT" envDefault:"50054"`
 	Redis    config.Redis
 	SMTP     config.SMTP
 }
@@ -54,25 +51,14 @@ func main() {
 
 	svc := service.New(mail, rdb)
 
-	grpcServer := grpc.NewServer()
-	notificationsv1.RegisterNotificationServiceServer(grpcServer, notifgrpc.NewServer(svc))
-	reflection.Register(grpcServer)
-
-	lis, err := net.Listen("tcp", ":"+cfg.GRPCPort)
-	if err != nil {
-		log.Error("failed to listen", "port", cfg.GRPCPort, "err", err)
+	if err := httpx.Serve(ctx, cfg.HTTPPort, api(svc), log); err != nil {
+		log.Error("http server", "err", err)
 		os.Exit(1)
 	}
+}
 
-	go func() {
-		log.Info("notifications service listening", "port", cfg.GRPCPort)
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Error("grpc server", "err", err)
-			os.Exit(1)
-		}
-	}()
-
-	<-ctx.Done()
-	log.Info("shutting down notifications service...")
-	grpcServer.GracefulStop()
+func api(svc *service.NotificationService) *chi.Mux {
+	router := chi.NewRouter()
+	notifhttp.NewHandler(svc).Register(httpx.NewAPI(router, "Notifications"))
+	return router
 }

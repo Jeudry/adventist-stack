@@ -21,7 +21,7 @@ type Base struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt *time.Time
-	CreatedBy *uuid.UUID
+	CreatedBy uuid.UUID
 	UpdatedBy *uuid.UUID
 	DeletedBy *uuid.UUID
 }

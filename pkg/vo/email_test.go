@@ -1,9 +1,11 @@
 package vo_test
 
 import (
-	"errors"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/Jeudry/adventist-stack/pkg/vo"
 )
@@ -22,12 +24,8 @@ func TestNewEmail_Valid(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			email, err := vo.NewEmail(tc.raw)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
-			if email.String() != tc.want {
-				t.Fatalf("got %q, want %q", email.String(), tc.want)
-			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, email.String())
 		})
 	}
 }
@@ -46,9 +44,7 @@ func TestNewEmail_Invalid(t *testing.T) {
 	for name, raw := range cases {
 		t.Run(name, func(t *testing.T) {
 			_, err := vo.NewEmail(raw)
-			if !errors.Is(err, vo.ErrInvalidEmail) {
-				t.Fatalf("got %v, want ErrInvalidEmail", err)
-			}
+			assert.ErrorIs(t, err, vo.ErrInvalidEmail)
 		})
 	}
 }
@@ -58,22 +54,14 @@ func TestEmail_Equals(t *testing.T) {
 	b, _ := vo.NewEmail("pastor@church.org")
 	c, _ := vo.NewEmail("elder@church.org")
 
-	if !a.Equals(b) {
-		t.Fatal("normalized emails should be equal")
-	}
-	if a.Equals(c) {
-		t.Fatal("different emails should not be equal")
-	}
+	assert.True(t, a.Equals(b), "%q and %q normalize to the same address", a.String(), b.String())
+	assert.False(t, a.Equals(c), "%q and %q are different addresses", a.String(), c.String())
 }
 
 func TestEmail_IsZero(t *testing.T) {
 	var zero vo.Email
-	if !zero.IsZero() {
-		t.Fatal("zero value should report IsZero")
-	}
+	assert.True(t, zero.IsZero(), "the zero value must report IsZero")
 
 	email, _ := vo.NewEmail("pastor@church.org")
-	if email.IsZero() {
-		t.Fatal("constructed email should not be zero")
-	}
+	assert.False(t, email.IsZero(), "a constructed email must not report IsZero")
 }
