@@ -82,7 +82,12 @@ func (h *Handler) Register(api huma.API) {
 }
 
 func (h *Handler) Create(ctx context.Context, in *httpx.In[PrayerRequest]) (*httpx.Out[PrayerVM], error) {
-	created, err := h.svc.Create(ctx, toDomain(in.Body, uuid.Nil, httpx.UserID(ctx)))
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	created, err := h.svc.Create(ctx, toDomain(in.Body, uuid.Nil, actor))
 	if err != nil {
 		return nil, domainError(err)
 	}
@@ -112,7 +117,12 @@ func (h *Handler) List(ctx context.Context, in *listPrayersInput) (*httpx.Out[ht
 }
 
 func (h *Handler) Update(ctx context.Context, in *updatePrayerInput) (*httpx.Out[PrayerVM], error) {
-	updated, err := h.svc.Update(ctx, toDomain(in.Body, uuid.MustParse(in.ID), httpx.UserID(ctx)))
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := h.svc.Update(ctx, toDomain(in.Body, uuid.MustParse(in.ID), actor))
 	if err != nil {
 		return nil, domainError(err)
 	}
@@ -120,7 +130,12 @@ func (h *Handler) Update(ctx context.Context, in *updatePrayerInput) (*httpx.Out
 }
 
 func (h *Handler) Delete(ctx context.Context, in *prayerIDInput) (*deletedOutput, error) {
-	if err := h.svc.Delete(ctx, uuid.MustParse(in.ID), httpx.UserID(ctx)); err != nil {
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := h.svc.Delete(ctx, uuid.MustParse(in.ID), actor); err != nil {
 		return nil, domainError(err)
 	}
 	return &deletedOutput{}, nil

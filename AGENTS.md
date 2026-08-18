@@ -86,6 +86,18 @@ services/<svc>/
 - La lista de columnas se declara **una sola vez** por entidad (`<entidad>Columns`) y la comparten el `SELECT`, el `INSERT ... RETURNING` y el `UPDATE ... RETURNING`. El orden de esa constante es el contrato que el `Scan` del mapper tiene que respetar.
 - `<entidad>_mapper.go` tiene el `scan<Entidad>(row)` y el `writableArgs`. `writableArgs` lleva solo las columnas que el cliente escribe; el update le saca `created_by` y le pone `updated_by`, para que ninguna de las dos sentencias escriba la columna de auditoría de la otra.
 - `pgx.ErrNoRows` → error de dominio (`ErrXNotFound`) es trabajo del repositorio.
+
+### Identidad
+- Toda operación que **escribe** usa `httpx.RequireUserID(ctx)`, que devuelve 401 si la petición no
+  trae llamante. Escribir `uuid.Nil` en `created_by` pondría un usuario inexistente indistinguible
+  de uno real. Las cuatro rutas de datos van detrás del `middleware.Auth` del gateway, así que una
+  escritura sin llamante significa que alguien llegó al servicio sin pasar por él.
+- La excepción es **auth/register**: nadie te crea, te registrás vos, así que ahí `created_by` en
+  ceros es el caso real y no un bug.
+- Las restricciones del request (`minLength`, `maximum`, `format`) se declaran **también** en las
+  etiquetas del modelo huma, no solo en el dominio: son las que llegan al OpenAPI, y sin ellas el
+  cliente descubre la regla recién con un 422. El dominio sigue validando igual — esa capa nunca es
+  la única guarda.
 - Una query que solo usan los tests (`select<Entidad>IncludingDeleted`) va como constante junto a las demás: el `_test.go` está en el mismo paquete y la usa con el mismo `scan`.
 - `toDomain` **devuelve `error`** cuando rehidrata VOs (email, phone).
 

@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/danielgtaylor/huma/v2"
+
 	"github.com/google/uuid"
 )
 
@@ -32,4 +34,16 @@ func Identity(next http.Handler) http.Handler {
 func UserID(ctx context.Context) uuid.UUID {
 	id, _ := ctx.Value(userIDKey).(uuid.UUID)
 	return id
+}
+
+// RequireUserID is UserID for the operations that write, which every service exposes behind the
+// gateway's Auth middleware. A write with no caller means the request skipped the gateway or the
+// middleware broke, and answering 401 says that. Storing uuid.Nil instead would put a user that
+// does not exist in created_by, indistinguishable from a real one.
+func RequireUserID(ctx context.Context) (uuid.UUID, error) {
+	id := UserID(ctx)
+	if id == uuid.Nil {
+		return uuid.Nil, huma.Error401Unauthorized("the request carries no authenticated caller")
+	}
+	return id, nil
 }

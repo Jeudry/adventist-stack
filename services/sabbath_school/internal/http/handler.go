@@ -81,7 +81,12 @@ func (h *Handler) Register(api huma.API) {
 }
 
 func (h *Handler) Create(ctx context.Context, in *httpx.In[SabbathSchoolRequest]) (*httpx.Out[SabbathSchoolVM], error) {
-	sabbathSchool, err := toDomain(in.Body, uuid.Nil, httpx.UserID(ctx))
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sabbathSchool, err := toDomain(in.Body, uuid.Nil, actor)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +123,12 @@ func (h *Handler) List(ctx context.Context, in *listSabbathSchoolsInput) (*httpx
 }
 
 func (h *Handler) Update(ctx context.Context, in *updateSabbathSchoolInput) (*httpx.Out[SabbathSchoolVM], error) {
-	sc, err := toDomain(in.Body, uuid.MustParse(in.ID), httpx.UserID(ctx))
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sc, err := toDomain(in.Body, uuid.MustParse(in.ID), actor)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +140,12 @@ func (h *Handler) Update(ctx context.Context, in *updateSabbathSchoolInput) (*ht
 }
 
 func (h *Handler) Delete(ctx context.Context, in *idInput) (*httpx.Out[struct{}], error) {
-	if err := h.svc.Delete(ctx, uuid.MustParse(in.ID), httpx.UserID(ctx)); err != nil {
+	actor, err := httpx.RequireUserID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := h.svc.Delete(ctx, uuid.MustParse(in.ID), actor); err != nil {
 		return nil, domainError(err)
 	}
 	return &httpx.Out[struct{}]{}, nil
